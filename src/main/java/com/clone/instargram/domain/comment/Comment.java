@@ -3,6 +3,7 @@ package com.clone.instargram.domain.comment;
 import com.clone.instargram.domain.common.Timestamped;
 import com.clone.instargram.domain.post.Post;
 import com.clone.instargram.domain.user.User;
+import com.clone.instargram.dto.Request.CommentDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,4 +35,13 @@ public class Comment extends Timestamped {
 
     @Column(nullable = false)
     private String content;
+
+    // 댓글 수정시 사용
+    public void update(CommentDto requestDto) {
+        this.content = requestDto.getContent();
+    }
+
+    public boolean validateUser(User user) {
+        return !this.user.getUsername().equals(user.getUsername());
+    }
 }

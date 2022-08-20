@@ -32,4 +32,6 @@ public class CommentLike extends Timestamped {
     @JoinColumn(name = "comment_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Comment comment;
+
+
 }
