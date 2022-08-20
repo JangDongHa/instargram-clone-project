@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> {
     Optional<Long> countByComment(Comment comment);
     Optional<List<CommentLikeMapping>> findUsersByComment(Comment comment);
-    boolean findCommentLikeByUserAndComment(User user, Comment comment);
+    Optional<CommentLike> findCommentLikeByUserAndComment(User user, Comment comment);
 
     List<CommentLike> findByCommentId(Long commentId);
 }

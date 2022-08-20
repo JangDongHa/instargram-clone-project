@@ -3,7 +3,6 @@ package com.clone.instargram.service.impl;
 import com.clone.instargram.domain.comment.Comment;
 import com.clone.instargram.domain.comment.CommentRepository;
 import com.clone.instargram.domain.comment.like.CommentLike;
-import com.clone.instargram.domain.comment.like.CommentLikeMapping;
 import com.clone.instargram.domain.comment.like.CommentLikeRepository;
 import com.clone.instargram.domain.post.Post;
 import com.clone.instargram.domain.post.PostRepository;
@@ -14,26 +13,21 @@ import com.clone.instargram.dto.Request.CommentDto;
 import com.clone.instargram.dto.ResponseDto;
 import com.clone.instargram.exception.definition.ExceptionNaming;
 import com.clone.instargram.service.CommentService;
-import com.clone.instargram.web.CommentApiController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class CommentServiceImpl implements CommentService {
-    PostRepository postRepository;
-    CommentRepository commentRepository;
-    CommentLikeRepository commentLikeRepository;
-    UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
+    private final UserRepository userRepository;
 
 
     // 댓글 작성
@@ -47,7 +41,7 @@ public class CommentServiceImpl implements CommentService {
                 () -> new NullPointerException(ExceptionNaming.CANNOT_FIND_POST)
         );
         Comment comment = Comment.builder()
-//                .user(user)
+                .user(user)
                 .post(post)
                 .content(requestDto.getContent())
                 .build();
@@ -122,7 +116,8 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new NullPointerException(ExceptionNaming.CANNOT_FIND_COMMENT)
         );
-        if (!commentLikeRepository.findCommentLikeByUserAndComment(user, comment)) {
+        CommentLike commentLike = commentLikeRepository.findCommentLikeByUserAndComment(user, comment).orElse(null);
+        if (commentLike == null) {
             commentLikeRepository.save(
                     CommentLike.builder()
                             .user(user)
@@ -134,12 +129,7 @@ public class CommentServiceImpl implements CommentService {
                     .data("좋아요 완료")
                     .build();
         } else {
-            commentLikeRepository.delete(
-                    CommentLike.builder()
-                            .user(user)
-                            .comment(comment)
-                            .build()
-            );
+            commentLikeRepository.delete(commentLike);
             return ResponseDto.builder()
                     .httpStatus(HttpStatus.OK)
                     .data("좋아요 취소 완료")
