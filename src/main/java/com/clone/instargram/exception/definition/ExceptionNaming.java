@@ -7,4 +7,6 @@ public class ExceptionNaming {
     public static final String NULL_EXCEPTION = "필요한 값을 입력하지 않았습니다.";
     public static final String PASSWORD_INCONSISTENCY = "패스워드가 일치하지 않습니다.";
     public static final String WRONG_TYPE = "잘못된 형식입니다.";
+
+    public static final String NOT_FOUND_USER = "존재하지 않는 유저입니다.";
 }
