@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
+
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final FollowRepository followRepository;
@@ -35,5 +36,6 @@ public class UserServiceImpl implements UserService {
 
         return new FeedProfileDto( user, postsCount , followerCount, followCount );
     }
+
 
 }
