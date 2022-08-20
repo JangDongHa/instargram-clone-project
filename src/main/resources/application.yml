@@ -2,10 +2,3 @@ spring:
   profiles:
     active:
       - dev
-
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://newl-db.cettdroaergd.ap-northeast-2.rds.amazonaws.com:3306/example_instargram
-    username: mstyu
-    password: xoals3828

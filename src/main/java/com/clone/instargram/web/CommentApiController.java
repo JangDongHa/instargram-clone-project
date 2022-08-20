@@ -4,7 +4,6 @@ import com.clone.instargram.config.jwt.token.RequestToken;
 import com.clone.instargram.dto.Request.CommentDto;
 import com.clone.instargram.dto.ResponseDto;
 import com.clone.instargram.service.CommentService;
-import com.clone.instargram.service.impl.CommentServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,21 +19,22 @@ public class CommentApiController {
     @PostMapping("/api/user/post/{postId}/comments")
     public ResponseDto<?> createComment(@PathVariable Long postId,
                                         @RequestBody CommentDto requestDto,
-                                        HttpServletRequest request){
+                                        HttpServletRequest request
+                                        ){
         return commentService.commentCreate(postId, requestDto, getUsername(request));
     }
 
     // 댓글 수정 - 로그인 필요
     @PutMapping("/api/user/posts/{postId}/comments/{commentId}")
     public ResponseDto<?> updateComment(@PathVariable Long postId, @PathVariable Long commentId,
-                                        @RequestBody CommentDto requestDto, HttpServletRequest request){
+                                        @RequestBody CommentDto requestDto,  HttpServletRequest request){
         return commentService.commentUpdate(postId, commentId, requestDto, getUsername(request));
     }
 
     // 댓글 삭제 - 로그인 필요
     @DeleteMapping("/api/user/posts/{postId}/comments/{commentId}")
     public ResponseDto<?> deleteComment(@PathVariable Long postId, @PathVariable Long commentId,
-                                        HttpServletRequest request){
+                                       HttpServletRequest request){
         return commentService.commentDelete(postId, commentId, getUsername(request));
     }
 

@@ -47,7 +47,7 @@ public class CommentServiceImpl implements CommentService {
                 () -> new NullPointerException(ExceptionNaming.CANNOT_FIND_POST)
         );
         Comment comment = Comment.builder()
-                .user(user)
+//                .user(user)
                 .post(post)
                 .content(requestDto.getContent())
                 .build();
@@ -147,8 +147,9 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+
     // 댓글 좋아요 상세보기
-    public ResponseDto<?> commentLikeInfo(Long postId, Long commentId){
+    public ResponseDto<?> commentLikeInfo(Long postId, Long commentId) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException(ExceptionNaming.CANNOT_FIND_POST)
         );
@@ -173,3 +174,5 @@ public class CommentServiceImpl implements CommentService {
                 .build();
     }
 }
+
+
