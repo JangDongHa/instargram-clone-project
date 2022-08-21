@@ -33,4 +33,5 @@ public class User extends Timestamped {
 
     @Column
     private String profileImage;
+
 }
