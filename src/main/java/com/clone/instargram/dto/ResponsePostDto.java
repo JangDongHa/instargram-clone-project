@@ -30,5 +30,23 @@ public class ResponsePostDto {
 
     }
 
+    public ResponsePostDto(Post post){
+        this.id = post.getId();
+        this.imageSource = post.getImageSource();
+        this.description = post.getDescription();
+        this.likesCount = post.getLikesCount();
+    }
+
+    public Post toPost(Post post){
+        return Post.builder()
+                .id(id)
+                .imageSource(imageSource)
+                .description(description)
+                .likesCount(likesCount)
+                .user(post.getUser())
+                .createdAt(post.getCreatedAt())
+                .build();
+    }
+
 
 }

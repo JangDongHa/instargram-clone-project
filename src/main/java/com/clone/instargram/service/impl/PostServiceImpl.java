@@ -13,6 +13,7 @@ import com.clone.instargram.domain.user.User;
 import com.clone.instargram.domain.user.UserRepository;
 import com.clone.instargram.dto.ResponsePostDto;
 import com.clone.instargram.dto.ResponsePostLikeUserDto;
+import com.clone.instargram.dto.ResponsePostListDto;
 import com.clone.instargram.dto.request.PostDto;
 import com.clone.instargram.dto.request.UpdatePostDto;
 import com.clone.instargram.exception.definition.PostExceptionNaming;
@@ -108,11 +109,14 @@ public class PostServiceImpl implements PostService {
     public String postLike(long postId, String usernameTK){
         User userPS = userRepository.findByUsername(usernameTK).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
+        ResponsePostDto dto = new ResponsePostDto(post);
 
         if(postLikeRepository.existsByUserAndPost(userPS, post)){
             PostLike postLikePS = postLikeRepository.findByUserAndPost(userPS, post).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE));
             postLikeRepository.delete(postLikePS);
 
+            dto.setLikesCount(dto.getLikesCount() - 1);
+            postRepository.save(dto.toPost(post));
             return PostReturnNaming.POST_LIKE_CANCEL_COMPLETE;
         }
 
@@ -121,9 +125,25 @@ public class PostServiceImpl implements PostService {
                 .post(post)
                 .build();
 
+
         postLikeRepository.save(postLike);
+        dto.setLikesCount(dto.getLikesCount() + 1);
+        postRepository.save(dto.toPost(post));
 
         return PostReturnNaming.POST_LIKE_COMPLETE;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ResponsePostListDto> getPostList(String username){
+        User userPS = userRepository.findByUsername(username).orElseThrow(()-> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
+
+        List<Post> postsPS = postRepository.findAllByUser(userPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST));
+        List<ResponsePostListDto> dtos = new ArrayList<>();
+
+        postsPS.forEach(post -> dtos.add(new ResponsePostListDto(post, commentRepository.countByPost(post).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE)))));
+
+        return dtos;
     }
 
 

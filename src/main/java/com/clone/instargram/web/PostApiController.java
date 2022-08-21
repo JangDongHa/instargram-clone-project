@@ -4,6 +4,7 @@ import com.clone.instargram.config.jwt.token.RequestToken;
 import com.clone.instargram.dto.ResponseDto;
 import com.clone.instargram.dto.ResponsePostDto;
 import com.clone.instargram.dto.ResponsePostLikeUserDto;
+import com.clone.instargram.dto.ResponsePostListDto;
 import com.clone.instargram.dto.request.PostDto;
 import com.clone.instargram.dto.request.UpdatePostDto;
 import com.clone.instargram.service.PostService;
@@ -47,6 +48,11 @@ public class PostApiController {
     @PostMapping("/api/user/posts/{postId}/likes")
     public ResponseDto<String> createPostLikeApi(@PathVariable long postId, HttpServletRequest request){
         return new ResponseDto<>(HttpStatus.OK, postService.postLike(postId, getUsername(request)));
+    }
+
+    @GetMapping("/api/user/{username}/posts")
+    public ResponseDto<List<ResponsePostListDto>> getPostListApi(@PathVariable String username){
+        return new ResponseDto<>(HttpStatus.OK, postService.getPostList(username));
     }
 
 
