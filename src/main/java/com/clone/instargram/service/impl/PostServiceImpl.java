@@ -56,11 +56,11 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public String updatePost(UpdatePostDto updatePostDto, String usernameTK){
-        User userPS = getValidUser(usernameTK, updatePostDto.getId());
+        validCheck(usernameTK, updatePostDto.getId());
 
         String imageSource = updateFileToS3(updatePostDto);
-        postRepository.save(updatePostDto.toPost(userPS, imageSource));
-        Post postPS = postRepository.findById(updatePostDto.getId()).orElseThrow();
+        Post postPS = postRepository.findById(updatePostDto.getId()).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST));
+        postRepository.save(updatePostDto.toPost(postPS, imageSource));
 
         tagRepository.deleteAllByPost(postPS);
         updatePostDto.getTags().forEach(tag -> tagRepository.save(updatePostDto.toTag(postPS, tag)));
@@ -109,14 +109,13 @@ public class PostServiceImpl implements PostService {
     public String postLike(long postId, String usernameTK){
         User userPS = userRepository.findByUsername(usernameTK).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
-        ResponsePostDto dto = new ResponsePostDto(post);
+        UpdatePostDto dto = new UpdatePostDto();
 
         if(postLikeRepository.existsByUserAndPost(userPS, post)){
             PostLike postLikePS = postLikeRepository.findByUserAndPost(userPS, post).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE));
             postLikeRepository.delete(postLikePS);
 
-            dto.setLikesCount(dto.getLikesCount() - 1);
-            postRepository.save(dto.toPost(post));
+            postRepository.save(dto.toPost(post, post.getLikesCount() - 1));
             return PostReturnNaming.POST_LIKE_CANCEL_COMPLETE;
         }
 
@@ -127,8 +126,7 @@ public class PostServiceImpl implements PostService {
 
 
         postLikeRepository.save(postLike);
-        dto.setLikesCount(dto.getLikesCount() + 1);
-        postRepository.save(dto.toPost(post));
+        postRepository.save(dto.toPost(post, post.getLikesCount() + 1));
 
         return PostReturnNaming.POST_LIKE_COMPLETE;
     }

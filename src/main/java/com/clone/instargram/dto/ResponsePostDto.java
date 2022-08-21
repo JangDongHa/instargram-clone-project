@@ -37,16 +37,5 @@ public class ResponsePostDto {
         this.likesCount = post.getLikesCount();
     }
 
-    public Post toPost(Post post){
-        return Post.builder()
-                .id(id)
-                .imageSource(imageSource)
-                .description(description)
-                .likesCount(likesCount)
-                .user(post.getUser())
-                .createdAt(post.getCreatedAt())
-                .build();
-    }
-
 
 }

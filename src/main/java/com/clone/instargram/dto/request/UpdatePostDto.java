@@ -2,7 +2,6 @@ package com.clone.instargram.dto.request;
 
 import com.clone.instargram.domain.post.Post;
 import com.clone.instargram.domain.tag.Tag;
-import com.clone.instargram.domain.user.User;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,12 +19,25 @@ public class UpdatePostDto {
     private String description;
     private List<String> tags;
 
-    public Post toPost(User user, String imageSource){
+    public Post toPost(Post post, String imageSource){
         return Post.builder()
-                .id(id)
+                .id(post.getId())
                 .imageSource(imageSource)
                 .description(description)
-                .user(user)
+                .user(post.getUser())
+                .createdAt(post.getCreatedAt())
+                .likesCount(post.getLikesCount())
+                .build();
+    }
+
+    public Post toPost(Post post, long likesCount){
+        return Post.builder()
+                .id(post.getId())
+                .imageSource(post.getImageSource())
+                .description(post.getDescription())
+                .user(post.getUser())
+                .createdAt(post.getCreatedAt())
+                .likesCount(likesCount)
                 .build();
     }
 
