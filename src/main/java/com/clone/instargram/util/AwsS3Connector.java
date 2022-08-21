@@ -1,14 +1,13 @@
-package com.clone.instargram.service.impl;
+package com.clone.instargram.util;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.clone.instargram.exception.definition.ExceptionNaming;
-import com.clone.instargram.util.FileUitls;
+import com.clone.instargram.exception.definition.AwsS3ExceptionNaming;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,10 +15,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @RequiredArgsConstructor
-@Service
-public class AwsS3ServiceImpl {
+@Component
+public class AwsS3Connector {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+
 
     private final AmazonS3Client amazonS3Client;
 
@@ -27,7 +27,7 @@ public class AwsS3ServiceImpl {
     public String uploadFileV1(MultipartFile multipartFile){
         validateFileExists(multipartFile);
 
-        String category = "termproject-image/";
+        String category = "instargram-image/";
         String fileName = FileUitls.buildFileName(category, multipartFile.getOriginalFilename());
         // AWS SDK 객체
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -41,9 +41,16 @@ public class AwsS3ServiceImpl {
         return filePath;
     }
 
+
+    @Transactional
+    public void deleteFileV1(String imageSource){
+        String filename = getFilenameInUrl(imageSource);
+        amazonS3Client.deleteObject(bucket, filename);
+    }
+
     private void validateFileExists(MultipartFile multipartFile)  {
         if (multipartFile.isEmpty()) {
-            throw new RuntimeException(ExceptionNaming.FAILED_SAVED);
+            throw new RuntimeException(AwsS3ExceptionNaming.FAILED_SAVED);
         }
     }
 
@@ -52,8 +59,12 @@ public class AwsS3ServiceImpl {
             amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (IOException e) {
-            throw new RuntimeException(ExceptionNaming.FAILED_SAVED);
+            throw new RuntimeException(AwsS3ExceptionNaming.FAILED_SAVED);
         }
+    }
+
+    private String getFilenameInUrl(String url){
+        return url.split("https://dong-example.s3.ap-northeast-2.amazonaws.com/")[1];
     }
 
 

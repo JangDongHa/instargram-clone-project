@@ -14,14 +14,15 @@ import java.util.List;
 @Setter
 @Builder
 @ToString
-public class PostDto {
+public class UpdatePostDto {
+    private long id;
     private MultipartFile file;
     private String description;
     private List<String> tags;
-    private String imageSource;
 
-    public Post toPost(User user){
+    public Post toPost(User user, String imageSource){
         return Post.builder()
+                .id(id)
                 .imageSource(imageSource)
                 .description(description)
                 .user(user)
