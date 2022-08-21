@@ -44,8 +44,11 @@ public class AwsS3Connector {
 
     @Transactional
     public void deleteFileV1(String imageSource){
-        String filename = getFilenameInUrl(imageSource);
-        amazonS3Client.deleteObject(bucket, filename);
+        String filename = FileUitls.getFilenameInUrl(imageSource);
+        System.out.println("filename : " + filename);
+        String key = amazonS3Client.getObject(bucket, filename).getKey();
+
+        amazonS3Client.deleteObject(bucket, key);
     }
 
     private void validateFileExists(MultipartFile multipartFile)  {
@@ -63,9 +66,7 @@ public class AwsS3Connector {
         }
     }
 
-    private String getFilenameInUrl(String url){
-        return url.split("https://dong-example.s3.ap-northeast-2.amazonaws.com/")[1];
-    }
+
 
 
 }

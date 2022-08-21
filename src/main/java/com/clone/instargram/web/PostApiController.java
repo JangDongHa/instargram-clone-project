@@ -32,6 +32,11 @@ public class PostApiController {
         return new ResponseDto<>(HttpStatus.OK, postService.getPost(postId));
     }
 
+    @DeleteMapping("/api/user/posts/{postId}")
+    public ResponseDto<String> deletePostApi(@PathVariable long postId, HttpServletRequest request) {
+        return new ResponseDto<>(HttpStatus.OK, postService.deletePost(postId, getUsername(request)));
+    }
+
 
     private String getUsername(HttpServletRequest request){
         RequestToken requestToken = new RequestToken(request);

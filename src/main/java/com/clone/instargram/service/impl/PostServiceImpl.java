@@ -51,10 +51,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public String updatePost(UpdatePostDto updatePostDto, String usernameTK){
-        User userPS = userRepository.findByUsername(usernameTK).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
-        if (!postRepository.existsByUserAndId(userPS, updatePostDto.getId()))
-            throw new IllegalArgumentException(PostExceptionNaming.NEED_AUTHORIZED);
-
+        User userPS = getValidUser(usernameTK, updatePostDto.getId());
 
         String imageSource = updateFileToS3(updatePostDto);
         postRepository.save(updatePostDto.toPost(userPS, imageSource));
@@ -69,17 +66,41 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(readOnly = true)
     public ResponsePostDto getPost(long postId){
-        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
+        Post postPS = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
 
-        List<Tag> tags = tagRepository.findAllByPost(post).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_TAGS));
-        List<Comment> comments = commentRepository.findAllByPost(post).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_COMMENTS));
+        List<Tag> tags = tagRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_TAGS));
+        List<Comment> comments = commentRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_COMMENTS));
 
-        return new ResponsePostDto(post, tags, comments);
+        return new ResponsePostDto(postPS, tags, comments);
+    }
+
+    @Override
+    @Transactional
+    public String deletePost(long postId, String usernameTK){
+        validCheck(usernameTK, postId);
+        Post postPS = postRepository.findById(postId).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
+        String imageSource = postPS.getImageSource();
+
+        postRepository.delete(postPS);
+        awsS3Connector.deleteFileV1(imageSource);
+
+        return PostReturnNaming.POST_DELETE_COMPLETE;
     }
 
     private String updateFileToS3(UpdatePostDto updatePostDto){
         String recentImageSource = postRepository.findById(updatePostDto.getId()).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST)).getImageSource();
         awsS3Connector.deleteFileV1(recentImageSource);
         return awsS3Connector.uploadFileV1(updatePostDto.getFile());
+    }
+
+    private void validCheck (String usernameTK, long postId){
+        getValidUser(usernameTK, postId);
+    }
+
+    private User getValidUser(String usernameTK, long postId){
+        User userPS = userRepository.findByUsername(usernameTK).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
+        if (!postRepository.existsByUserAndId(userPS, postId))
+            throw new IllegalArgumentException(PostExceptionNaming.NEED_AUTHORIZED);
+        return userPS;
     }
 }
