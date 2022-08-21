@@ -45,7 +45,6 @@ public class AwsS3Connector {
     @Transactional
     public void deleteFileV1(String imageSource){
         String filename = FileUitls.getFilenameInUrl(imageSource);
-        System.out.println("filename : " + filename);
         String key = amazonS3Client.getObject(bucket, filename).getKey();
 
         amazonS3Client.deleteObject(bucket, key);

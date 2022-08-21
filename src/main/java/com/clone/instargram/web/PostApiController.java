@@ -3,6 +3,7 @@ package com.clone.instargram.web;
 import com.clone.instargram.config.jwt.token.RequestToken;
 import com.clone.instargram.dto.ResponseDto;
 import com.clone.instargram.dto.ResponsePostDto;
+import com.clone.instargram.dto.ResponsePostLikeUserDto;
 import com.clone.instargram.dto.request.PostDto;
 import com.clone.instargram.dto.request.UpdatePostDto;
 import com.clone.instargram.service.PostService;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -35,6 +37,16 @@ public class PostApiController {
     @DeleteMapping("/api/user/posts/{postId}")
     public ResponseDto<String> deletePostApi(@PathVariable long postId, HttpServletRequest request) {
         return new ResponseDto<>(HttpStatus.OK, postService.deletePost(postId, getUsername(request)));
+    }
+
+    @GetMapping("/api/user/posts/{postId}/likes")
+    public ResponseDto<List<ResponsePostLikeUserDto>> getPostLikeUsersApi(@PathVariable long postId){
+        return new ResponseDto<>(HttpStatus.OK, postService.getPostLikeUsers(postId));
+    }
+
+    @PostMapping("/api/user/posts/{postId}/likes")
+    public ResponseDto<String> createPostLikeApi(@PathVariable long postId, HttpServletRequest request){
+        return new ResponseDto<>(HttpStatus.OK, postService.postLike(postId, getUsername(request)));
     }
 
 

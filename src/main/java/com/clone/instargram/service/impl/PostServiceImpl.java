@@ -4,12 +4,15 @@ import com.clone.instargram.domain.comment.Comment;
 import com.clone.instargram.domain.comment.CommentRepository;
 import com.clone.instargram.domain.post.Post;
 import com.clone.instargram.domain.post.PostRepository;
+import com.clone.instargram.domain.post.like.PostLike;
+import com.clone.instargram.domain.post.like.PostLikeMapping;
 import com.clone.instargram.domain.post.like.PostLikeRepository;
 import com.clone.instargram.domain.tag.Tag;
 import com.clone.instargram.domain.tag.TagRepository;
 import com.clone.instargram.domain.user.User;
 import com.clone.instargram.domain.user.UserRepository;
 import com.clone.instargram.dto.ResponsePostDto;
+import com.clone.instargram.dto.ResponsePostLikeUserDto;
 import com.clone.instargram.dto.request.PostDto;
 import com.clone.instargram.dto.request.UpdatePostDto;
 import com.clone.instargram.exception.definition.PostExceptionNaming;
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -86,6 +90,43 @@ public class PostServiceImpl implements PostService {
 
         return PostReturnNaming.POST_DELETE_COMPLETE;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ResponsePostLikeUserDto> getPostLikeUsers(long postId){
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
+        List<PostLikeMapping> users = postLikeRepository.findUsersByPost(post).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE));
+
+        List<ResponsePostLikeUserDto> dto = new ArrayList<>();
+        users.forEach(m -> dto.add(new ResponsePostLikeUserDto(m.getUser())));
+
+        return dto;
+    }
+
+    @Override
+    @Transactional
+    public String postLike(long postId, String usernameTK){
+        User userPS = userRepository.findByUsername(usernameTK).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
+
+        if(postLikeRepository.existsByUserAndPost(userPS, post)){
+            PostLike postLikePS = postLikeRepository.findByUserAndPost(userPS, post).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE));
+            postLikeRepository.delete(postLikePS);
+
+            return PostReturnNaming.POST_LIKE_CANCEL_COMPLETE;
+        }
+
+        PostLike postLike = PostLike.builder()
+                .user(userPS)
+                .post(post)
+                .build();
+
+        postLikeRepository.save(postLike);
+
+        return PostReturnNaming.POST_LIKE_COMPLETE;
+    }
+
+
 
     private String updateFileToS3(UpdatePostDto updatePostDto){
         String recentImageSource = postRepository.findById(updatePostDto.getId()).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST)).getImageSource();

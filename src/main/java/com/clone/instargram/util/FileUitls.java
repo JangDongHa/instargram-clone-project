@@ -8,7 +8,6 @@ public class FileUitls {
 //CommonUtils.buildFileName(category, multipartFile.getOriginalFilename());
     public static String buildFileName(String category, String filename){
         String randomId = UUID.randomUUID().toString();
-        System.out.println("파일 이름 : " + category + filename + "/" + randomId);
         return category + filename + "/" + randomId;
     }
 
