@@ -9,6 +9,10 @@ import com.clone.instargram.dto.request.PostDto;
 import com.clone.instargram.dto.request.UpdatePostDto;
 import com.clone.instargram.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +57,11 @@ public class PostApiController {
     @GetMapping("/api/user/{username}/posts")
     public ResponseDto<List<ResponsePostListDto>> getPostListApi(@PathVariable String username){
         return new ResponseDto<>(HttpStatus.OK, postService.getPostList(username));
+    }
+
+    @GetMapping("/api/recent/posts")
+    public ResponseDto<Page<ResponsePostListDto>> getRecentPostListApi(@PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+        return new ResponseDto<>(HttpStatus.OK, postService.getRecentPostList(pageable));
     }
 
 

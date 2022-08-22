@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Long> countByUser(User user);
     Boolean existsByUserAndId(User user, long id);
-    Optional<List<Post>> findAllByUser(User user);
+    Optional<List<Post>> findAllByUserOrderByIdDesc(User user);
 }

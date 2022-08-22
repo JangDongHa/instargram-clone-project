@@ -21,6 +21,9 @@ import com.clone.instargram.service.PostService;
 import com.clone.instargram.service.definition.PostReturnNaming;
 import com.clone.instargram.util.AwsS3Connector;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,10 +101,10 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
         List<PostLikeMapping> users = postLikeRepository.findUsersByPost(post).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE));
 
-        List<ResponsePostLikeUserDto> dto = new ArrayList<>();
-        users.forEach(m -> dto.add(new ResponsePostLikeUserDto(m.getUser())));
+        List<ResponsePostLikeUserDto> dtoList = new ArrayList<>();
+        users.forEach(m -> dtoList.add(new ResponsePostLikeUserDto(m.getUser())));
 
-        return dto;
+        return dtoList;
     }
 
     @Override
@@ -136,12 +139,24 @@ public class PostServiceImpl implements PostService {
     public List<ResponsePostListDto> getPostList(String username){
         User userPS = userRepository.findByUsername(username).orElseThrow(()-> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
 
-        List<Post> postsPS = postRepository.findAllByUser(userPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST));
-        List<ResponsePostListDto> dtos = new ArrayList<>();
+        List<Post> postsPS = postRepository.findAllByUserOrderByIdDesc(userPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST));
+        List<ResponsePostListDto> dtoList = new ArrayList<>();
 
-        postsPS.forEach(post -> dtos.add(new ResponsePostListDto(post, commentRepository.countByPost(post).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE)))));
+        postsPS.forEach(post -> dtoList.add(new ResponsePostListDto(post, commentRepository.countByPost(post).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE)))));
 
-        return dtos;
+        return dtoList;
+    }
+
+    @Override
+    @Transactional
+    public Page<ResponsePostListDto> getRecentPostList(Pageable pageable){
+        Page<Post> postsPS = postRepository.findAll(pageable);
+        List<ResponsePostListDto> dtoList = new ArrayList<>();
+
+        postsPS.forEach(post -> dtoList.add(new ResponsePostListDto(post, commentRepository.countByPost(post).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE)))));
+
+
+        return new PageImpl<>(dtoList, pageable, dtoList.size());
     }
 
 
