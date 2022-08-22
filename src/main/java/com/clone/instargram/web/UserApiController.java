@@ -10,11 +10,9 @@ import com.clone.instargram.dto.request.UserDto;
 import com.clone.instargram.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.clone.instargram.dto.FeedProfileDto;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RequiredArgsConstructor
@@ -45,5 +43,11 @@ public class UserApiController {
     private String getUsername(HttpServletRequest request){
         RequestToken requestToken = new RequestToken(request);
         return requestToken.getUsername().orElseThrow();
+    }
+
+    // 피드 회원정보 보기
+    @GetMapping("/api/user/{username}")
+    public ResponseEntity<ResponseDto<FeedProfileDto>> getFeedProfile(@PathVariable String username ){
+        return ResponseEntity.ok( new ResponseDto<>( HttpStatus.OK , userService.getFeedProfile( username ) ));
     }
 }

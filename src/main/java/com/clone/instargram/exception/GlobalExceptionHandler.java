@@ -7,6 +7,8 @@ import com.clone.instargram.exception.definition.AwsS3ExceptionNaming;
 import com.clone.instargram.exception.definition.ExceptionNaming;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,5 +51,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = DataIntegrityViolationException.class)
     public ResponseDto<String> dataIntegrityViolationException(DataIntegrityViolationException e){
         return new ResponseDto<>(HttpStatus.CONFLICT, ExceptionNaming.WRONG_TYPE);
+    }
+
+    // 존재하지 않는 회원의 경우
+    @ExceptionHandler(value = UsernameNotFoundException.class)
+    public ResponseEntity<ResponseDto<String>> usernameNotFoundException(UsernameNotFoundException e){
+        return new ResponseEntity<>( new ResponseDto<>(HttpStatus.NOT_FOUND , ExceptionNaming.NOT_FOUND_USER ) , HttpStatus.NOT_FOUND );
     }
 }
