@@ -54,6 +54,7 @@ public class FollowServiceImpl implements FollowService {
 
    // 팔로워 목록 보기
     @Override
+    @Transactional( readOnly = true )
     public List<FollowResponseDto> getFollowers(String toUsername, String myname) {
 
         User toUser = userRepository.findByUsername( toUsername ).orElseThrow(
@@ -77,6 +78,7 @@ public class FollowServiceImpl implements FollowService {
 
     // 팔로우 목록 보기
     @Override
+    @Transactional( readOnly = true )
     public List<FollowResponseDto> getFollows(String fromUsername, String myname) {
         User fromUser = userRepository.findByUsername( fromUsername ).orElseThrow(
                 () -> new UsernameNotFoundException(ExceptionNaming.NOT_FOUND_USER )
