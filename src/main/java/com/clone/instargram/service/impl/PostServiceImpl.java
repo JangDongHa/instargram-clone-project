@@ -163,8 +163,9 @@ public class PostServiceImpl implements PostService {
 
     private String updateFileToS3(UpdatePostDto updatePostDto){
         String recentImageSource = postRepository.findById(updatePostDto.getId()).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST)).getImageSource();
+        String filePath = awsS3Connector.uploadFileV1(updatePostDto.getFile());
         awsS3Connector.deleteFileV1(recentImageSource);
-        return awsS3Connector.uploadFileV1(updatePostDto.getFile());
+        return filePath;
     }
 
     private void validCheck (String usernameTK, long postId){

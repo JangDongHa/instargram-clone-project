@@ -57,6 +57,8 @@ public class AwsS3Connector {
         if (multipartFile.isEmpty()) {
             throw new RuntimeException(AwsS3ExceptionNaming.FAILED_SAVED);
         }
+        if (!multipartFile.getContentType().contains("image"))
+            throw new RuntimeException(AwsS3ExceptionNaming.WRONG_TYPE);
     }
 
     private void uploadImageToS3(MultipartFile multipartFile, String fileName, ObjectMetadata objectMetadata){

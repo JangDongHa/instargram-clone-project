@@ -3,6 +3,7 @@ package com.clone.instargram.exception;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.clone.instargram.dto.ResponseDto;
+import com.clone.instargram.exception.definition.AwsS3ExceptionNaming;
 import com.clone.instargram.exception.definition.ExceptionNaming;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public ResponseDto<String> proceedAllException(Exception e){
+        if (e.getMessage().contains("upload size"))
+            return new ResponseDto<>(HttpStatus.NOT_ACCEPTABLE, AwsS3ExceptionNaming.WRONG_SIZE);
         return new ResponseDto<>(HttpStatus.EXPECTATION_FAILED, e.getMessage());
     }
 
