@@ -2,8 +2,11 @@ package com.clone.instargram.service.impl;
 
 import com.clone.instargram.domain.user.User;
 import com.clone.instargram.domain.user.UserRepository;
+import com.clone.instargram.dto.ResponseUserDto;
 import com.clone.instargram.dto.request.RegisterDto;
+import com.clone.instargram.dto.request.UpdateUserDto;
 import com.clone.instargram.dto.request.UpdateUserProfileDto;
+import com.clone.instargram.dto.request.UserDto;
 import com.clone.instargram.exception.definition.UserExceptionNaming;
 import com.clone.instargram.service.UserService;
 import com.clone.instargram.service.definition.UserReturnNaming;
@@ -42,9 +45,35 @@ public class UserServiceImpl implements UserService {
         return UserReturnNaming.USER_PROFILE_UPDATE_COMPLETE;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseUserDto checkUpdateUser(UserDto dto, String username){
+        User userPS = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException(UserExceptionNaming.CANNOT_FIND_USERNAME));
+        if (!checkUserPassword(userPS.getPassword(), dto.getPassword()))
+            throw new IllegalArgumentException(UserExceptionNaming.INCONSISTENCY_PASSWORD);
+
+        return new ResponseUserDto(userPS);
+    }
+
+    @Override
+    @Transactional
+    public String updateUser(UpdateUserDto dto, String username){
+        if (dto.isNull())
+            throw new IllegalArgumentException(UserExceptionNaming.UPDATE_USER_FAIL);
+        User userPS = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException(UserExceptionNaming.CANNOT_FIND_USERNAME));
+        dto.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
+
+        userRepository.save(dto.toUser(userPS));
+        return UserExceptionNaming.UPDATE_USER_COMPLETE;
+    }
+
     private String updateFileToS3(UpdateUserProfileDto updateDto, User user){
         String recentImageSource = user.getProfileImage();
         awsS3Connector.deleteFileV1(recentImageSource);
         return awsS3Connector.uploadFileV1(updateDto.getFile());
+    }
+
+    private boolean checkUserPassword(String passwordPS, String password){
+        return bCryptPasswordEncoder.matches(password, passwordPS);
     }
 }

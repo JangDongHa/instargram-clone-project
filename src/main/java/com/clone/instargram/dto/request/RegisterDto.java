@@ -21,6 +21,7 @@ public class RegisterDto {
                 .password(encryptPassword)
                 .nickname(nickname)
                 .email(email)
+                .description("")
                 .build();
     }
 }

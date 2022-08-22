@@ -30,7 +30,6 @@ public class User extends Timestamped {
     @Column(nullable = false, length = 50)
     private String email;
 
-    @Column
     private String description;
 
     @Column
