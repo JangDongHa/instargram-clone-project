@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ public class CommentServiceImpl implements CommentService {
 
     // 댓글 작성
     @Override
+    @Transactional
     public ResponseDto<?> commentCreate(Long postId, CommentDto requestDto,
                                         String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
@@ -54,6 +56,7 @@ public class CommentServiceImpl implements CommentService {
 
     // 댓글 수정
     @Override
+    @Transactional
     public ResponseDto<?> commentUpdate(Long postId, Long commentId,
                                         CommentDto requestDto, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
@@ -81,6 +84,7 @@ public class CommentServiceImpl implements CommentService {
 
     // 댓글 삭제
     @Override
+    @Transactional
     public ResponseDto<?> commentDelete(Long postId, Long commentId, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException(ExceptionNaming.NEED_TOKEN)
@@ -106,6 +110,7 @@ public class CommentServiceImpl implements CommentService {
 
     // 댓글 좋아요 & 취소
     @Override
+    @Transactional
     public ResponseDto<?> commentLike(Long postId, Long commentId, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException(ExceptionNaming.NEED_TOKEN)
@@ -139,6 +144,7 @@ public class CommentServiceImpl implements CommentService {
 
 
     // 댓글 좋아요 상세보기
+    @Override
     public ResponseDto<?> commentLikeInfo(Long postId, Long commentId) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException(ExceptionNaming.CANNOT_FIND_POST)
@@ -152,8 +158,7 @@ public class CommentServiceImpl implements CommentService {
             commentLikeInfoResponseDtoList.add(
                     CommentLikeInfoResponseDto.builder()
                             .username(commentLike.getUser().getUsername())
-//                            .nickname(commentLike.getUser().getNickname())
-                            // 유저 엔티티에 닉네임 없고 ERD에도 없음
+                            .nickname(commentLike.getUser().getNickname())
                             .profileImage(commentLike.getUser().getProfileImage())
                             .build()
             );
