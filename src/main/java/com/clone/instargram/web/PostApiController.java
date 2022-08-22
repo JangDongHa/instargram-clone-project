@@ -1,9 +1,74 @@
 package com.clone.instargram.web;
 
+import com.clone.instargram.config.jwt.token.RequestToken;
+import com.clone.instargram.dto.ResponseDto;
+import com.clone.instargram.dto.ResponsePostDto;
+import com.clone.instargram.dto.ResponsePostLikeUserDto;
+import com.clone.instargram.dto.ResponsePostListDto;
+import com.clone.instargram.dto.request.PostDto;
+import com.clone.instargram.dto.request.UpdatePostDto;
+import com.clone.instargram.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
 public class PostApiController {
+    private final PostService postService;
+    @PostMapping("/api/user/posts")
+    public ResponseDto<String> createPostApi(PostDto postDto, HttpServletRequest request){
+        return new ResponseDto<>(HttpStatus.OK, postService.createPost(postDto, getUsername(request)));
+    }
+
+    @PutMapping("/api/user/posts/{postId}")
+    public ResponseDto<String> updatePostApi(@PathVariable long postId, HttpServletRequest request, UpdatePostDto updatePostDto){
+        updatePostDto.setId(postId);
+        return new ResponseDto<>(HttpStatus.OK, postService.updatePost(updatePostDto, getUsername(request)));
+    }
+
+    @GetMapping("/api/user/posts/{postId}")
+    public ResponseDto<ResponsePostDto> getPostApi(@PathVariable long postId){
+        return new ResponseDto<>(HttpStatus.OK, postService.getPost(postId));
+    }
+
+    @DeleteMapping("/api/user/posts/{postId}")
+    public ResponseDto<String> deletePostApi(@PathVariable long postId, HttpServletRequest request) {
+        return new ResponseDto<>(HttpStatus.OK, postService.deletePost(postId, getUsername(request)));
+    }
+
+    @GetMapping("/api/user/posts/{postId}/likes")
+    public ResponseDto<List<ResponsePostLikeUserDto>> getPostLikeUsersApi(@PathVariable long postId){
+        return new ResponseDto<>(HttpStatus.OK, postService.getPostLikeUsers(postId));
+    }
+
+    @PostMapping("/api/user/posts/{postId}/likes")
+    public ResponseDto<String> createPostLikeApi(@PathVariable long postId, HttpServletRequest request){
+        return new ResponseDto<>(HttpStatus.OK, postService.postLike(postId, getUsername(request)));
+    }
+
+    @GetMapping("/api/user/{username}/posts")
+    public ResponseDto<List<ResponsePostListDto>> getPostListApi(@PathVariable String username){
+        return new ResponseDto<>(HttpStatus.OK, postService.getPostList(username));
+    }
+
+    @GetMapping("/api/recent/posts")
+    public ResponseDto<Page<ResponsePostListDto>> getRecentPostListApi(@PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+        return new ResponseDto<>(HttpStatus.OK, postService.getRecentPostList(pageable));
+    }
+
+
+    private String getUsername(HttpServletRequest request){
+        RequestToken requestToken = new RequestToken(request);
+        return requestToken.getUsername().orElseThrow();
+    }
+
+
 }

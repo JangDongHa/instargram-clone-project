@@ -31,4 +31,7 @@ public class Post extends Timestamped {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne
     private User user;
+
+    @Column(columnDefinition = "Bigint default 0")
+    private long likesCount;
 }

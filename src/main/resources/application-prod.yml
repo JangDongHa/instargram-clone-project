@@ -42,3 +42,16 @@ logging:
     '[org.apache.coyote.http11]': DEBUG
     '[org.springframework.web]': DEBUG
     '[org.hibernate]': DEBUG
+
+# AWS S3 Bucket Access Key (IAM csv)
+cloud:
+  aws:
+    credentials:
+      access-key: ${{ secrets.AWS_S3_ACCESS_KEY }}
+      secret-key: ${{ secrets.AWS_S3_SECRET_KEY }}
+    s3:
+      bucket: dong-example
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
