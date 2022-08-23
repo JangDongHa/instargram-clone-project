@@ -1,5 +1,6 @@
 package com.clone.instargram.service;
 
+import com.clone.instargram.dto.ResponsePostUserListDto;
 import com.clone.instargram.dto.request.PostStringDto;
 import com.clone.instargram.dto.request.UpdatePostStringDto;
 import com.clone.instargram.dto.ResponsePostDto;
@@ -18,5 +19,5 @@ public interface PostService {
     List<ResponsePostLikeUserDto> getPostLikeUsers(long postId);
     String postLike(long postId, String usernameTK);
     List<ResponsePostListDto> getPostList(String username);
-    Page<ResponsePostListDto> getRecentPostList(Pageable pageable);
+    Page<ResponsePostUserListDto> getRecentPostList(Pageable pageable);
 }

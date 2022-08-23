@@ -14,6 +14,7 @@ import com.clone.instargram.domain.user.UserRepository;
 import com.clone.instargram.dto.ResponsePostDto;
 import com.clone.instargram.dto.ResponsePostLikeUserDto;
 import com.clone.instargram.dto.ResponsePostListDto;
+import com.clone.instargram.dto.ResponsePostUserListDto;
 import com.clone.instargram.dto.request.PostStringDto;
 import com.clone.instargram.dto.request.UpdatePostDto;
 import com.clone.instargram.dto.request.UpdatePostStringDto;
@@ -176,9 +177,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Page<ResponsePostListDto> getRecentPostList(Pageable pageable){
+    public Page<ResponsePostUserListDto> getRecentPostList(Pageable pageable){
         Page<Post> postsPS = postRepository.findAll(pageable);
-        Page<ResponsePostListDto> dtoList = postsPS.map(post -> new ResponsePostListDto(post, commentRepository.countByPost(post).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE))));;
+        Page<ResponsePostUserListDto> dtoList = postsPS.map(post -> new ResponsePostUserListDto(post, commentRepository.countByPost(post)
+                .orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE)),
+                tagRepository.findAllByPost(post).orElse(null).get(0)));;
 
         return dtoList;
     }

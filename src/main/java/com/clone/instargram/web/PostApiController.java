@@ -1,12 +1,9 @@
 package com.clone.instargram.web;
 
 import com.clone.instargram.config.jwt.token.RequestToken;
+import com.clone.instargram.dto.*;
 import com.clone.instargram.dto.request.PostStringDto;
 import com.clone.instargram.dto.request.UpdatePostStringDto;
-import com.clone.instargram.dto.ResponseDto;
-import com.clone.instargram.dto.ResponsePostDto;
-import com.clone.instargram.dto.ResponsePostLikeUserDto;
-import com.clone.instargram.dto.ResponsePostListDto;
 import com.clone.instargram.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -60,7 +57,7 @@ public class PostApiController {
     }
 
     @GetMapping("/api/recent/posts")
-    public ResponseDto<Page<ResponsePostListDto>> getRecentPostListApi(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+    public ResponseDto<Page<ResponsePostUserListDto>> getRecentPostListApi(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
         return new ResponseDto<>(HttpStatus.OK, postService.getRecentPostList(pageable));
     }
 
