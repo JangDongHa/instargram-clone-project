@@ -117,8 +117,6 @@ public class PostServiceImpl implements PostService {
 
         List<Tag> tag = tagRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_TAGS));
         postRepository.delete(postPS);
-        if (tag.size() != 0)
-            tagRepository.delete(tag.get(0));
 
         //awsS3Connector.deleteFileV1(imageSource);
 
