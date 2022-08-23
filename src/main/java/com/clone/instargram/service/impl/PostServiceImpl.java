@@ -113,10 +113,14 @@ public class PostServiceImpl implements PostService {
     public String deletePost(long postId, String usernameTK){
         validCheck(usernameTK, postId);
         Post postPS = postRepository.findById(postId).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
-        String imageSource = postPS.getImageSource();
+        //String imageSource = postPS.getImageSource();
 
+        List<Tag> tag = tagRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_TAGS));
         postRepository.delete(postPS);
-        awsS3Connector.deleteFileV1(imageSource);
+        if (tag.size() != 0)
+            tagRepository.delete(tag.get(0));
+
+        //awsS3Connector.deleteFileV1(imageSource);
 
         return PostReturnNaming.POST_DELETE_COMPLETE;
     }
