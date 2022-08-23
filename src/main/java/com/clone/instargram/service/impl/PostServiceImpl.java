@@ -11,10 +11,11 @@ import com.clone.instargram.domain.tag.Tag;
 import com.clone.instargram.domain.tag.TagRepository;
 import com.clone.instargram.domain.user.User;
 import com.clone.instargram.domain.user.UserRepository;
+import com.clone.instargram.dto.Request.PostStringDto;
+import com.clone.instargram.dto.Request.UpdatePostStringDto;
 import com.clone.instargram.dto.ResponsePostDto;
 import com.clone.instargram.dto.ResponsePostLikeUserDto;
 import com.clone.instargram.dto.ResponsePostListDto;
-import com.clone.instargram.dto.request.PostDto;
 import com.clone.instargram.dto.request.UpdatePostDto;
 import com.clone.instargram.exception.definition.PostExceptionNaming;
 import com.clone.instargram.service.PostService;
@@ -41,35 +42,60 @@ public class PostServiceImpl implements PostService {
     private final PostLikeRepository postLikeRepository;
     private final CommentRepository commentRepository;
 
+//    @Override
+//    @Transactional
+//    public String createPost(PostDto postDto, String usernameTK){
+//        User userPS = userRepository.findByUsername(usernameTK).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
+//
+//        String imageSource = awsS3Connector.uploadFileV1(postDto.getFile());
+//        postDto.setImageSource(imageSource);
+//        Post post = postDto.toPost(userPS);
+//        postRepository.save(post);
+//
+//        postDto.getTags().forEach(tag-> tagRepository.save(postDto.toTag(post, tag))); // map 사용 시 저장이 안되는 것 같아서 foreach 사용
+//        return PostReturnNaming.POST_COMPLETE;
+//    }
+
     @Override
     @Transactional
-    public String createPost(PostDto postDto, String usernameTK){
+    public String createPost(PostStringDto postDto, String usernameTK){
         User userPS = userRepository.findByUsername(usernameTK).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
 
-        String imageSource = awsS3Connector.uploadFileV1(postDto.getFile());
-        postDto.setImageSource(imageSource);
-        Post post = postDto.toPost(userPS);
-        postRepository.save(post);
+        Post postPS = postRepository.save(postDto.toPost(userPS));
+        tagRepository.save(postDto.toTag(postPS));
 
-        postDto.getTags().forEach(tag-> tagRepository.save(postDto.toTag(post, tag))); // map 사용 시 저장이 안되는 것 같아서 foreach 사용
         return PostReturnNaming.POST_COMPLETE;
     }
 
-
     @Override
     @Transactional
-    public String updatePost(UpdatePostDto updatePostDto, String usernameTK){
+    public String updatePost(UpdatePostStringDto updatePostDto, String usernameTK){
         validCheck(usernameTK, updatePostDto.getId());
 
-        String imageSource = updateFileToS3(updatePostDto);
-        Post postPS = postRepository.findById(updatePostDto.getId()).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST));
-        postRepository.save(updatePostDto.toPost(postPS, imageSource));
+        Post postPS = postRepository.findById(updatePostDto.getId()).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
+        List<Tag> tag = tagRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_TAGS));
 
-        tagRepository.deleteAllByPost(postPS);
-        updatePostDto.getTags().forEach(tag -> tagRepository.save(updatePostDto.toTag(postPS, tag)));
+        postRepository.save(updatePostDto.toPost(postPS));
+        tagRepository.save(updatePostDto.toTag(tag.get(0)));
 
         return PostReturnNaming.POST_UPDATE_COMPLETE;
     }
+
+
+//    @Override
+//    @Transactional
+//    public String updatePost(UpdatePostDto updatePostDto, String usernameTK){
+//        validCheck(usernameTK, updatePostDto.getId());
+//
+//        String imageSource = updateFileToS3(updatePostDto);
+//        Post postPS = postRepository.findById(updatePostDto.getId()).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST));
+//        postRepository.save(updatePostDto.toPost(postPS, imageSource));
+//
+//        tagRepository.deleteAllByPost(postPS);
+//        updatePostDto.getTags().forEach(tag -> tagRepository.save(updatePostDto.toTag(postPS, tag)));
+//
+//        return PostReturnNaming.POST_UPDATE_COMPLETE;
+//    }
 
     @Override
     @Transactional(readOnly = true)
