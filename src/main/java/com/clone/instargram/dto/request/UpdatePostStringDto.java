@@ -1,4 +1,4 @@
-package com.clone.instargram.dto.Request;
+package com.clone.instargram.dto.request;
 
 import com.clone.instargram.domain.post.Post;
 import com.clone.instargram.domain.tag.Tag;

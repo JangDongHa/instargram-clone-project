@@ -1,7 +1,7 @@
 package com.clone.instargram.service;
 
-import com.clone.instargram.dto.Request.PostStringDto;
-import com.clone.instargram.dto.Request.UpdatePostStringDto;
+import com.clone.instargram.dto.request.PostStringDto;
+import com.clone.instargram.dto.request.UpdatePostStringDto;
 import com.clone.instargram.dto.ResponsePostDto;
 import com.clone.instargram.dto.ResponsePostLikeUserDto;
 import com.clone.instargram.dto.ResponsePostListDto;

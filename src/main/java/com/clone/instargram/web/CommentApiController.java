@@ -1,7 +1,7 @@
 package com.clone.instargram.web;
 
 import com.clone.instargram.config.jwt.token.RequestToken;
-import com.clone.instargram.dto.Request.CommentDto;
+import com.clone.instargram.dto.request.CommentDto;
 import com.clone.instargram.dto.ResponseDto;
 import com.clone.instargram.service.CommentService;
 import lombok.RequiredArgsConstructor;

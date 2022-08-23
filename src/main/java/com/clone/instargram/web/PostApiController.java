@@ -1,8 +1,8 @@
 package com.clone.instargram.web;
 
 import com.clone.instargram.config.jwt.token.RequestToken;
-import com.clone.instargram.dto.Request.PostStringDto;
-import com.clone.instargram.dto.Request.UpdatePostStringDto;
+import com.clone.instargram.dto.request.PostStringDto;
+import com.clone.instargram.dto.request.UpdatePostStringDto;
 import com.clone.instargram.dto.ResponseDto;
 import com.clone.instargram.dto.ResponsePostDto;
 import com.clone.instargram.dto.ResponsePostLikeUserDto;

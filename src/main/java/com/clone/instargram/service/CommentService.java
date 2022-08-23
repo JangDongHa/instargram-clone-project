@@ -1,6 +1,6 @@
 package com.clone.instargram.service;
 
-import com.clone.instargram.dto.Request.CommentDto;
+import com.clone.instargram.dto.request.CommentDto;
 import com.clone.instargram.dto.ResponseDto;
 
 
