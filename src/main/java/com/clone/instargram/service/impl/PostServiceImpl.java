@@ -23,7 +23,6 @@ import com.clone.instargram.service.definition.PostReturnNaming;
 import com.clone.instargram.util.AwsS3Connector;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -179,12 +178,9 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public Page<ResponsePostListDto> getRecentPostList(Pageable pageable){
         Page<Post> postsPS = postRepository.findAll(pageable);
-        List<ResponsePostListDto> dtoList = new ArrayList<>();
+        Page<ResponsePostListDto> dtoList = postsPS.map(post -> new ResponsePostListDto(post, commentRepository.countByPost(post).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE))));;
 
-        postsPS.forEach(post -> dtoList.add(new ResponsePostListDto(post, commentRepository.countByPost(post).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE)))));
-
-
-        return new PageImpl<>(dtoList, pageable, dtoList.size());
+        return dtoList;
     }
 
 
