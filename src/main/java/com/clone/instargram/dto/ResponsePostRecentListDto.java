@@ -17,6 +17,7 @@ public class ResponsePostRecentListDto {
     private String description;
     private Tag tag;
     private String nickname;
+    private String username;
     private String profileImage;
 
     public ResponsePostRecentListDto(Post post, long commentsCount, Tag tag){
@@ -27,6 +28,7 @@ public class ResponsePostRecentListDto {
         this.description = post.getDescription();
         this.tag = tag;
         this.nickname = post.getUser().getNickname();
+        this.username = post.getUser().getUsername();
         this.profileImage = post.getUser().getProfileImage();
     }
 }
