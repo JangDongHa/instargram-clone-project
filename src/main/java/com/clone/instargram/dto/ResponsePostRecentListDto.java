@@ -20,7 +20,9 @@ public class ResponsePostRecentListDto {
     private String username;
     private String profileImage;
 
-    public ResponsePostRecentListDto(Post post, long commentsCount, Tag tag){
+    private boolean isLiked;
+
+    public ResponsePostRecentListDto(Post post, long commentsCount, Tag tag, boolean isLiked){
         this.id = post.getId();
         this.imageSource = post.getImageSource();
         this.likesCount = post.getLikesCount();
@@ -30,5 +32,7 @@ public class ResponsePostRecentListDto {
         this.nickname = post.getUser().getNickname();
         this.username = post.getUser().getUsername();
         this.profileImage = post.getUser().getProfileImage();
+        this.isLiked = isLiked;
     }
+
 }
