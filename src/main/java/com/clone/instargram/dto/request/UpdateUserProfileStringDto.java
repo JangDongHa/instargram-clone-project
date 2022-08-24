@@ -10,11 +10,12 @@ import lombok.*;
 @Builder
 public class UpdateUserProfileStringDto {
     private String file;
+    private String description;
 
     public User toUser(User user){
         return User.builder()
                 .id(user.getId())
-                .description(user.getDescription())
+                .description(description)
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .password(user.getPassword())
