@@ -47,7 +47,7 @@ public class PostApiController {
     }
 
     @PostMapping("/api/user/posts/{postId}/likes")
-    public ResponseDto<String> createPostLikeApi(@PathVariable long postId, HttpServletRequest request){
+    public ResponseDto<Boolean> createPostLikeApi(@PathVariable long postId, HttpServletRequest request){
         return new ResponseDto<>(HttpStatus.OK, postService.postLike(postId, getUsername(request)));
     }
 

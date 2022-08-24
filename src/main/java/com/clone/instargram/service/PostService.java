@@ -17,7 +17,7 @@ public interface PostService {
     ResponsePostDto getPost(long postId);
     String deletePost(long postId, String usernameTK);
     List<ResponsePostLikeUserDto> getPostLikeUsers(long postId);
-    String postLike(long postId, String usernameTK);
+    Boolean postLike(long postId, String usernameTK);
     List<ResponsePostListDto> getPostList(String username);
     Page<ResponsePostUserListDto> getRecentPostList(Pageable pageable);
 }

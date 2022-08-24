@@ -137,7 +137,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public String postLike(long postId, String usernameTK){
+    public Boolean postLike(long postId, String usernameTK){
         User userPS = userRepository.findByUsername(usernameTK).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
         UpdatePostDto dto = new UpdatePostDto();
@@ -147,7 +147,7 @@ public class PostServiceImpl implements PostService {
             postLikeRepository.delete(postLikePS);
 
             postRepository.save(dto.toPost(post, post.getLikesCount() - 1));
-            return PostReturnNaming.POST_LIKE_CANCEL_COMPLETE;
+            return false;
         }
 
         PostLike postLike = PostLike.builder()
@@ -159,7 +159,7 @@ public class PostServiceImpl implements PostService {
         postLikeRepository.save(postLike);
         postRepository.save(dto.toPost(post, post.getLikesCount() + 1));
 
-        return PostReturnNaming.POST_LIKE_COMPLETE;
+        return true;
     }
 
     @Override

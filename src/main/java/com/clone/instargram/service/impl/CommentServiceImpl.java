@@ -137,7 +137,7 @@ public class CommentServiceImpl implements CommentService {
 
             return ResponseDto.builder()
                     .httpStatus(HttpStatus.OK)
-                    .data("좋아요 완료.")
+                    .data(true)
                     .build();
         } else {
             dto.setLikeCount(dto.getLikeCount() - 1);
@@ -146,7 +146,7 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.save(comment);
             return ResponseDto.builder()
                     .httpStatus(HttpStatus.OK)
-                    .data("좋아요 취소 완료.")
+                    .data(false)
                     .build();
         }
     }
