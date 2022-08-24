@@ -90,9 +90,9 @@ public class CommentServiceImpl implements CommentService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException(ExceptionNaming.NEED_TOKEN)
         );
-//        Post post = postRepository.findById(postId).orElseThrow(
-//                () -> new NullPointerException(ExceptionNaming.CANNOT_FIND_POST)
-//        );
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new NullPointerException(ExceptionNaming.CANNOT_FIND_POST)
+        );
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new NullPointerException(ExceptionNaming.CANNOT_FIND_COMMENT)
         );
