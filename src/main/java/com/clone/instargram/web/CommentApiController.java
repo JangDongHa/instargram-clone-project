@@ -16,7 +16,7 @@ public class CommentApiController {
     private final CommentService commentService;
 
     // 댓글 작성 - 로그인 필요
-    @PostMapping("/api/user/post/{postId}/comments")
+    @PostMapping("/api/user/posts/{postId}/comments")
     public ResponseDto<?> createComment(@PathVariable Long postId,
                                         @RequestBody CommentDto requestDto,
                                         HttpServletRequest request
