@@ -11,10 +11,7 @@ import com.clone.instargram.domain.tag.Tag;
 import com.clone.instargram.domain.tag.TagRepository;
 import com.clone.instargram.domain.user.User;
 import com.clone.instargram.domain.user.UserRepository;
-import com.clone.instargram.dto.ResponsePostDto;
-import com.clone.instargram.dto.ResponsePostLikeUserDto;
-import com.clone.instargram.dto.ResponsePostListDto;
-import com.clone.instargram.dto.ResponsePostUserListDto;
+import com.clone.instargram.dto.*;
 import com.clone.instargram.dto.request.PostStringDto;
 import com.clone.instargram.dto.request.UpdatePostDto;
 import com.clone.instargram.dto.request.UpdatePostStringDto;
@@ -104,8 +101,9 @@ public class PostServiceImpl implements PostService {
 
         List<Tag> tags = tagRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_TAGS));
         List<Comment> comments = commentRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_COMMENTS));
+        List<ResponseCommentDto> commentDtos = comments.stream().map(ResponseCommentDto::new).toList();
 
-        return new ResponsePostDto(postPS, tags, comments);
+        return new ResponsePostDto(postPS, tags, commentDtos);
     }
 
     @Override
@@ -177,9 +175,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Page<ResponsePostUserListDto> getRecentPostList(Pageable pageable){
+    public Page<ResponsePostRecentListDto> getRecentPostList(Pageable pageable){
         Page<Post> postsPS = postRepository.findAll(pageable);
-        Page<ResponsePostUserListDto> dtoList = postsPS.map(post -> new ResponsePostUserListDto(post, commentRepository.countByPost(post)
+        Page<ResponsePostRecentListDto> dtoList = postsPS.map(post -> new ResponsePostRecentListDto(post, commentRepository.countByPost(post)
                 .orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE)),
                 tagRepository.findAllByPost(post).orElse(null).get(0)));;
 

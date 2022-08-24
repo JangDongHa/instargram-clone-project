@@ -9,20 +9,24 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class ResponsePostUserListDto {
+public class ResponsePostRecentListDto {
     private long id;
     private String imageSource;
     private long likesCount;
     private long commentsCount;
     private String description;
     private Tag tag;
+    private String nickname;
+    private String profileImage;
 
-    public ResponsePostUserListDto(Post post, long commentsCount, Tag tag){
+    public ResponsePostRecentListDto(Post post, long commentsCount, Tag tag){
         this.id = post.getId();
         this.imageSource = post.getImageSource();
         this.likesCount = post.getLikesCount();
         this.commentsCount =commentsCount;
         this.description = post.getDescription();
         this.tag = tag;
+        this.nickname = post.getUser().getNickname();
+        this.profileImage = post.getUser().getProfileImage();
     }
 }
