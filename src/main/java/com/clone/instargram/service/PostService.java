@@ -14,7 +14,7 @@ import java.util.List;
 public interface PostService {
     String createPost(PostStringDto postDto, String usernameTK);
     String updatePost(UpdatePostStringDto postDto, String usernameTK);
-    ResponsePostDto getPost(long postId);
+    ResponsePostDto getPost(long postId, String username);
     String deletePost(long postId, String usernameTK);
     List<ResponsePostLikeUserDto> getPostLikeUsers(long postId);
     Boolean postLike(long postId, String usernameTK);

@@ -15,15 +15,18 @@ public class ResponseCommentDto {
     private long likesCount;
     private String profileImage;
 
-    public ResponseCommentDto(Comment comment){
-        fromComment(comment);
+    private boolean isLiked;
+
+    public ResponseCommentDto(Comment comment, boolean isLiked){
+        fromComment(comment, isLiked);
     }
 
-    public void fromComment(Comment comment){
+    public void fromComment(Comment comment, boolean isLiked){
         this.id = comment.getId();
         this.nickname = comment.getUser().getNickname();
         this.content = comment.getContent();
         this.likesCount = comment.getLikesCount();
         this.profileImage = comment.getUser().getProfileImage();
+
     }
 }

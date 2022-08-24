@@ -32,8 +32,8 @@ public class PostApiController {
     }
 
     @GetMapping("/api/user/posts/{postId}")
-    public ResponseDto<ResponsePostDto> getPostApi(@PathVariable long postId){
-        return new ResponseDto<>(HttpStatus.OK, postService.getPost(postId));
+    public ResponseDto<ResponsePostDto> getPostApi(@PathVariable long postId, HttpServletRequest request){
+        return new ResponseDto<>(HttpStatus.OK, postService.getPost(postId, getUsername(request)));
     }
 
     @DeleteMapping("/api/user/posts/{postId}")

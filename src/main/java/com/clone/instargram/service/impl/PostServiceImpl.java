@@ -2,6 +2,7 @@ package com.clone.instargram.service.impl;
 
 import com.clone.instargram.domain.comment.Comment;
 import com.clone.instargram.domain.comment.CommentRepository;
+import com.clone.instargram.domain.comment.like.CommentLikeRepository;
 import com.clone.instargram.domain.post.Post;
 import com.clone.instargram.domain.post.PostRepository;
 import com.clone.instargram.domain.post.like.PostLike;
@@ -39,6 +40,8 @@ public class PostServiceImpl implements PostService {
     private final AwsS3Connector awsS3Connector;
     private final PostLikeRepository postLikeRepository;
     private final CommentRepository commentRepository;
+
+    private final CommentLikeRepository commentLikeRepository;
 
 //    @Override
 //    @Transactional
@@ -97,12 +100,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponsePostDto getPost(long postId){
+    public ResponsePostDto getPost(long postId, String username){
+        User userPS = userRepository.findByUsername(username).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
         Post postPS = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
 
         List<Tag> tags = tagRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_TAGS));
         List<Comment> comments = commentRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_COMMENTS));
-        List<ResponseCommentDto> commentDtos = comments.stream().map(ResponseCommentDto::new).toList();
+        List<ResponseCommentDto> commentDtos = comments.stream().map(comment -> new ResponseCommentDto(comment, commentLikeRepository.existsByUserAndComment(userPS, comment))).toList();
 
         return new ResponsePostDto(postPS, tags, commentDtos);
     }
