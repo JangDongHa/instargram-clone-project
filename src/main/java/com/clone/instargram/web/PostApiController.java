@@ -57,8 +57,9 @@ public class PostApiController {
     }
 
     @GetMapping("/api/recent/posts")
-    public ResponseDto<Page<ResponsePostRecentListDto>> getRecentPostListApi(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
-        return new ResponseDto<>(HttpStatus.OK, postService.getRecentPostList(pageable));
+    public ResponseDto<Page<ResponsePostRecentListDto>> getRecentPostListApi(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+    , HttpServletRequest request){
+        return new ResponseDto<>(HttpStatus.OK, postService.getRecentPostList(pageable, getUsername(request)));
     }
 
 

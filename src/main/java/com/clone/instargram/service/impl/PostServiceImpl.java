@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.IllformedLocaleException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -175,11 +176,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Page<ResponsePostRecentListDto> getRecentPostList(Pageable pageable){
+    public Page<ResponsePostRecentListDto> getRecentPostList(Pageable pageable, String username){
+        User userPS = userRepository.findByUsername(username).orElseThrow(()->new IllformedLocaleException(PostExceptionNaming.CANNOT_FIND_USER));
         Page<Post> postsPS = postRepository.findAll(pageable);
-        Page<ResponsePostRecentListDto> dtoList = postsPS.map(post -> new ResponsePostRecentListDto(post, commentRepository.countByPost(post)
-                .orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE)),
-                tagRepository.findAllByPost(post).orElse(null).get(0)));;
+        Page<ResponsePostRecentListDto> dtoList = postsPS.map(post ->
+                        new ResponsePostRecentListDto(post, commentRepository.countByPost(post).orElse(0L), tagRepository.findAllByPost(post).orElse(null).get(0)
+                                , postLikeRepository.existsByUserAndPost(userPS, post)));
+
 
         return dtoList;
     }
