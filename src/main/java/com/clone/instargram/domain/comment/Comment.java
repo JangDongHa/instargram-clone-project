@@ -3,8 +3,9 @@ package com.clone.instargram.domain.comment;
 import com.clone.instargram.domain.common.Timestamped;
 import com.clone.instargram.domain.post.Post;
 import com.clone.instargram.domain.user.User;
+import com.clone.instargram.dto.request.LikeCountDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.clone.instargram.dto.Request.CommentDto;
+import com.clone.instargram.dto.request.CommentDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,4 +52,6 @@ public class Comment extends Timestamped {
     public boolean validateUser(User user) {
         return !this.user.getUsername().equals(user.getUsername());
     }
+
+    public void updateCount(LikeCountDto dto){ this.likesCount = dto.getLikeCount();}
 }

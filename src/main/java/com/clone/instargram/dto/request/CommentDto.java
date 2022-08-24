@@ -1,4 +1,4 @@
-package com.clone.instargram.dto.Request;
+package com.clone.instargram.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

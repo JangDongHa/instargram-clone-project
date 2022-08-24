@@ -1,12 +1,9 @@
 package com.clone.instargram.web;
 
 import com.clone.instargram.config.jwt.token.RequestToken;
-import com.clone.instargram.dto.ResponseDto;
-import com.clone.instargram.dto.ResponsePostDto;
-import com.clone.instargram.dto.ResponsePostLikeUserDto;
-import com.clone.instargram.dto.ResponsePostListDto;
-import com.clone.instargram.dto.request.PostDto;
-import com.clone.instargram.dto.request.UpdatePostDto;
+import com.clone.instargram.dto.*;
+import com.clone.instargram.dto.request.PostStringDto;
+import com.clone.instargram.dto.request.UpdatePostStringDto;
 import com.clone.instargram.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,12 +21,12 @@ import java.util.List;
 public class PostApiController {
     private final PostService postService;
     @PostMapping("/api/user/posts")
-    public ResponseDto<String> createPostApi(PostDto postDto, HttpServletRequest request){
+    public ResponseDto<String> createPostApi(@RequestBody PostStringDto postDto, HttpServletRequest request){
         return new ResponseDto<>(HttpStatus.OK, postService.createPost(postDto, getUsername(request)));
     }
 
     @PutMapping("/api/user/posts/{postId}")
-    public ResponseDto<String> updatePostApi(@PathVariable long postId, HttpServletRequest request, UpdatePostDto updatePostDto){
+    public ResponseDto<String> updatePostApi(@PathVariable long postId, HttpServletRequest request, @RequestBody UpdatePostStringDto updatePostDto){
         updatePostDto.setId(postId);
         return new ResponseDto<>(HttpStatus.OK, postService.updatePost(updatePostDto, getUsername(request)));
     }
@@ -50,7 +47,7 @@ public class PostApiController {
     }
 
     @PostMapping("/api/user/posts/{postId}/likes")
-    public ResponseDto<String> createPostLikeApi(@PathVariable long postId, HttpServletRequest request){
+    public ResponseDto<Boolean> createPostLikeApi(@PathVariable long postId, HttpServletRequest request){
         return new ResponseDto<>(HttpStatus.OK, postService.postLike(postId, getUsername(request)));
     }
 
@@ -60,7 +57,7 @@ public class PostApiController {
     }
 
     @GetMapping("/api/recent/posts")
-    public ResponseDto<Page<ResponsePostListDto>> getRecentPostListApi(@PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
+    public ResponseDto<Page<ResponsePostRecentListDto>> getRecentPostListApi(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable){
         return new ResponseDto<>(HttpStatus.OK, postService.getRecentPostList(pageable));
     }
 

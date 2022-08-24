@@ -1,24 +1,21 @@
 package com.clone.instargram.service.impl;
 
 
-import com.clone.instargram.domain.user.User;
-import com.clone.instargram.domain.user.UserRepository;
-import com.clone.instargram.dto.ResponseUserDto;
-import com.clone.instargram.dto.request.RegisterDto;
-import com.clone.instargram.dto.request.UpdateUserDto;
-import com.clone.instargram.dto.request.UpdateUserProfileDto;
-import com.clone.instargram.dto.request.UserDto;
-import com.clone.instargram.exception.definition.UserExceptionNaming;
 import com.clone.instargram.domain.follow.FollowRepository;
 import com.clone.instargram.domain.post.PostRepository;
+import com.clone.instargram.domain.user.User;
+import com.clone.instargram.domain.user.UserRepository;
 import com.clone.instargram.dto.FeedProfileDto;
+import com.clone.instargram.dto.ResponseUserDto;
+import com.clone.instargram.dto.request.*;
 import com.clone.instargram.exception.definition.ExceptionNaming;
+import com.clone.instargram.exception.definition.UserExceptionNaming;
 import com.clone.instargram.service.UserService;
 import com.clone.instargram.service.definition.UserReturnNaming;
 import com.clone.instargram.util.AwsS3Connector;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,16 +38,24 @@ public class UserServiceImpl implements UserService {
         return "회원가입 완료";
     }
 
-    @Override
-    @Transactional
-    public String updateProfileImage(String username, UpdateUserProfileDto dto){
+    public String updateProfileImage(String username, UpdateUserProfileStringDto dto){
         User userPS = userRepository.findByUsername(username).orElseThrow(()->new IllegalArgumentException(UserExceptionNaming.CANNOT_FIND_USERNAME));
 
-        String imageSource = updateFileToS3(dto, userPS);
-        userRepository.save(dto.toUser(userPS, imageSource));
+        userRepository.save(dto.toUser(userPS));
 
         return UserReturnNaming.USER_PROFILE_UPDATE_COMPLETE;
     }
+
+//    @Override
+//    @Transactional
+//    public String updateProfileImage(String username, UpdateUserProfileDto dto){
+//        User userPS = userRepository.findByUsername(username).orElseThrow(()->new IllegalArgumentException(UserExceptionNaming.CANNOT_FIND_USERNAME));
+//
+//        String imageSource = updateFileToS3(dto, userPS);
+//        userRepository.save(dto.toUser(userPS, imageSource));
+//
+//        return UserReturnNaming.USER_PROFILE_UPDATE_COMPLETE;
+//    }
 
     @Override
     @Transactional(readOnly = true)

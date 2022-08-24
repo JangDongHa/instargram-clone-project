@@ -11,18 +11,16 @@ import com.clone.instargram.domain.tag.Tag;
 import com.clone.instargram.domain.tag.TagRepository;
 import com.clone.instargram.domain.user.User;
 import com.clone.instargram.domain.user.UserRepository;
-import com.clone.instargram.dto.ResponsePostDto;
-import com.clone.instargram.dto.ResponsePostLikeUserDto;
-import com.clone.instargram.dto.ResponsePostListDto;
-import com.clone.instargram.dto.request.PostDto;
+import com.clone.instargram.dto.*;
+import com.clone.instargram.dto.request.PostStringDto;
 import com.clone.instargram.dto.request.UpdatePostDto;
+import com.clone.instargram.dto.request.UpdatePostStringDto;
 import com.clone.instargram.exception.definition.PostExceptionNaming;
 import com.clone.instargram.service.PostService;
 import com.clone.instargram.service.definition.PostReturnNaming;
 import com.clone.instargram.util.AwsS3Connector;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,35 +39,60 @@ public class PostServiceImpl implements PostService {
     private final PostLikeRepository postLikeRepository;
     private final CommentRepository commentRepository;
 
+//    @Override
+//    @Transactional
+//    public String createPost(PostDto postDto, String usernameTK){
+//        User userPS = userRepository.findByUsername(usernameTK).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
+//
+//        String imageSource = awsS3Connector.uploadFileV1(postDto.getFile());
+//        postDto.setImageSource(imageSource);
+//        Post post = postDto.toPost(userPS);
+//        postRepository.save(post);
+//
+//        postDto.getTags().forEach(tag-> tagRepository.save(postDto.toTag(post, tag))); // map 사용 시 저장이 안되는 것 같아서 foreach 사용
+//        return PostReturnNaming.POST_COMPLETE;
+//    }
+
     @Override
     @Transactional
-    public String createPost(PostDto postDto, String usernameTK){
+    public String createPost(PostStringDto postDto, String usernameTK){
         User userPS = userRepository.findByUsername(usernameTK).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
 
-        String imageSource = awsS3Connector.uploadFileV1(postDto.getFile());
-        postDto.setImageSource(imageSource);
-        Post post = postDto.toPost(userPS);
-        postRepository.save(post);
+        Post postPS = postRepository.save(postDto.toPost(userPS));
+        tagRepository.save(postDto.toTag(postPS));
 
-        postDto.getTags().forEach(tag-> tagRepository.save(postDto.toTag(post, tag))); // map 사용 시 저장이 안되는 것 같아서 foreach 사용
         return PostReturnNaming.POST_COMPLETE;
     }
 
-
     @Override
     @Transactional
-    public String updatePost(UpdatePostDto updatePostDto, String usernameTK){
+    public String updatePost(UpdatePostStringDto updatePostDto, String usernameTK){
         validCheck(usernameTK, updatePostDto.getId());
 
-        String imageSource = updateFileToS3(updatePostDto);
-        Post postPS = postRepository.findById(updatePostDto.getId()).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST));
-        postRepository.save(updatePostDto.toPost(postPS, imageSource));
+        Post postPS = postRepository.findById(updatePostDto.getId()).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
+        List<Tag> tag = tagRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_TAGS));
 
-        tagRepository.deleteAllByPost(postPS);
-        updatePostDto.getTags().forEach(tag -> tagRepository.save(updatePostDto.toTag(postPS, tag)));
+        postRepository.save(updatePostDto.toPost(postPS));
+        tagRepository.save(updatePostDto.toTag(tag.get(0)));
 
         return PostReturnNaming.POST_UPDATE_COMPLETE;
     }
+
+
+//    @Override
+//    @Transactional
+//    public String updatePost(UpdatePostDto updatePostDto, String usernameTK){
+//        validCheck(usernameTK, updatePostDto.getId());
+//
+//        String imageSource = updateFileToS3(updatePostDto);
+//        Post postPS = postRepository.findById(updatePostDto.getId()).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST));
+//        postRepository.save(updatePostDto.toPost(postPS, imageSource));
+//
+//        tagRepository.deleteAllByPost(postPS);
+//        updatePostDto.getTags().forEach(tag -> tagRepository.save(updatePostDto.toTag(postPS, tag)));
+//
+//        return PostReturnNaming.POST_UPDATE_COMPLETE;
+//    }
 
     @Override
     @Transactional(readOnly = true)
@@ -78,8 +101,9 @@ public class PostServiceImpl implements PostService {
 
         List<Tag> tags = tagRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_TAGS));
         List<Comment> comments = commentRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_COMMENTS));
+        List<ResponseCommentDto> commentDtos = comments.stream().map(ResponseCommentDto::new).toList();
 
-        return new ResponsePostDto(postPS, tags, comments);
+        return new ResponsePostDto(postPS, tags, commentDtos);
     }
 
     @Override
@@ -87,10 +111,12 @@ public class PostServiceImpl implements PostService {
     public String deletePost(long postId, String usernameTK){
         validCheck(usernameTK, postId);
         Post postPS = postRepository.findById(postId).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
-        String imageSource = postPS.getImageSource();
+        //String imageSource = postPS.getImageSource();
 
+        List<Tag> tag = tagRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_TAGS));
         postRepository.delete(postPS);
-        awsS3Connector.deleteFileV1(imageSource);
+
+        //awsS3Connector.deleteFileV1(imageSource);
 
         return PostReturnNaming.POST_DELETE_COMPLETE;
     }
@@ -109,7 +135,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public String postLike(long postId, String usernameTK){
+    public Boolean postLike(long postId, String usernameTK){
         User userPS = userRepository.findByUsername(usernameTK).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
         UpdatePostDto dto = new UpdatePostDto();
@@ -119,7 +145,7 @@ public class PostServiceImpl implements PostService {
             postLikeRepository.delete(postLikePS);
 
             postRepository.save(dto.toPost(post, post.getLikesCount() - 1));
-            return PostReturnNaming.POST_LIKE_CANCEL_COMPLETE;
+            return false;
         }
 
         PostLike postLike = PostLike.builder()
@@ -131,7 +157,7 @@ public class PostServiceImpl implements PostService {
         postLikeRepository.save(postLike);
         postRepository.save(dto.toPost(post, post.getLikesCount() + 1));
 
-        return PostReturnNaming.POST_LIKE_COMPLETE;
+        return true;
     }
 
     @Override
@@ -149,14 +175,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Page<ResponsePostListDto> getRecentPostList(Pageable pageable){
+    public Page<ResponsePostRecentListDto> getRecentPostList(Pageable pageable){
         Page<Post> postsPS = postRepository.findAll(pageable);
-        List<ResponsePostListDto> dtoList = new ArrayList<>();
+        Page<ResponsePostRecentListDto> dtoList = postsPS.map(post -> new ResponsePostRecentListDto(post, commentRepository.countByPost(post)
+                .orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE)),
+                tagRepository.findAllByPost(post).orElse(null).get(0)));;
 
-        postsPS.forEach(post -> dtoList.add(new ResponsePostListDto(post, commentRepository.countByPost(post).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE)))));
-
-
-        return new PageImpl<>(dtoList, pageable, dtoList.size());
+        return dtoList;
     }
 
 

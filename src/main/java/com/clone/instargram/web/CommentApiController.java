@@ -1,7 +1,7 @@
 package com.clone.instargram.web;
 
 import com.clone.instargram.config.jwt.token.RequestToken;
-import com.clone.instargram.dto.Request.CommentDto;
+import com.clone.instargram.dto.request.CommentDto;
 import com.clone.instargram.dto.ResponseDto;
 import com.clone.instargram.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class CommentApiController {
     private final CommentService commentService;
 
     // 댓글 작성 - 로그인 필요
-    @PostMapping("/api/user/post/{postId}/comments")
+    @PostMapping("/api/user/posts/{postId}/comments")
     public ResponseDto<?> createComment(@PathVariable Long postId,
                                         @RequestBody CommentDto requestDto,
                                         HttpServletRequest request

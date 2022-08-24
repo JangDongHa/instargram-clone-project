@@ -9,7 +9,8 @@ import com.clone.instargram.domain.post.PostRepository;
 import com.clone.instargram.domain.user.User;
 import com.clone.instargram.domain.user.UserRepository;
 import com.clone.instargram.dto.CommentLikeInfoResponseDto;
-import com.clone.instargram.dto.Request.CommentDto;
+import com.clone.instargram.dto.request.CommentDto;
+import com.clone.instargram.dto.request.LikeCountDto;
 import com.clone.instargram.dto.ResponseDto;
 import com.clone.instargram.exception.definition.ExceptionNaming;
 import com.clone.instargram.service.CommentService;
@@ -121,23 +122,31 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new NullPointerException(ExceptionNaming.CANNOT_FIND_COMMENT)
         );
+        LikeCountDto dto = new LikeCountDto(comment.getLikesCount());
         CommentLike commentLike = commentLikeRepository.findCommentLikeByUserAndComment(user, comment).orElse(null);
         if (commentLike == null) {
+            dto.setLikeCount(dto.getLikeCount() + 1);
             commentLikeRepository.save(
                     CommentLike.builder()
                             .user(user)
                             .comment(comment)
                             .build()
             );
+            comment.updateCount(dto);
+            commentRepository.save(comment);
+
             return ResponseDto.builder()
                     .httpStatus(HttpStatus.OK)
-                    .data("좋아요 완료.")
+                    .data(true)
                     .build();
         } else {
+            dto.setLikeCount(dto.getLikeCount() - 1);
             commentLikeRepository.delete(commentLike);
+            comment.updateCount(dto);
+            commentRepository.save(comment);
             return ResponseDto.builder()
                     .httpStatus(HttpStatus.OK)
-                    .data("좋아요 취소 완료.")
+                    .data(false)
                     .build();
         }
     }

@@ -3,10 +3,7 @@ package com.clone.instargram.web;
 import com.clone.instargram.config.jwt.token.RequestToken;
 import com.clone.instargram.dto.ResponseDto;
 import com.clone.instargram.dto.ResponseUserDto;
-import com.clone.instargram.dto.request.RegisterDto;
-import com.clone.instargram.dto.request.UpdateUserDto;
-import com.clone.instargram.dto.request.UpdateUserProfileDto;
-import com.clone.instargram.dto.request.UserDto;
+import com.clone.instargram.dto.request.*;
 import com.clone.instargram.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +23,7 @@ public class UserApiController {
     }
 
     @PostMapping("/api/user/profile")
-    public ResponseDto<String> updateProfileApi(UpdateUserProfileDto dto, HttpServletRequest request){
+    public ResponseDto<String> updateProfileApi(@RequestBody UpdateUserProfileStringDto dto, HttpServletRequest request){
         return new ResponseDto<>(HttpStatus.OK, userService.updateProfileImage(getUsername(request), dto));
     }
 
