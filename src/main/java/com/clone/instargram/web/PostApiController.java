@@ -42,8 +42,8 @@ public class PostApiController {
     }
 
     @GetMapping("/api/user/posts/{postId}/likes")
-    public ResponseDto<List<ResponsePostLikeUserDto>> getPostLikeUsersApi(@PathVariable long postId){
-        return new ResponseDto<>(HttpStatus.OK, postService.getPostLikeUsers(postId));
+    public ResponseDto<List<ResponsePostLikeUserDto>> getPostLikeUsersApi(@PathVariable long postId, HttpServletRequest request){
+        return new ResponseDto<>(HttpStatus.OK, postService.getPostLikeUsers(postId, getUsername(request)));
     }
 
     @PostMapping("/api/user/posts/{postId}/likes")

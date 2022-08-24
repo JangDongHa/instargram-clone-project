@@ -13,13 +13,16 @@ public class ResponsePostLikeUserDto {
     private String nickname;
     private String profileImage;
 
-    public ResponsePostLikeUserDto(User user){
-        fromUser(user);
+    private boolean isFollowed;
+
+    public ResponsePostLikeUserDto(User user, boolean isFollowed){
+        fromUser(user, isFollowed);
     }
 
-    public void fromUser(User user){
+    public void fromUser(User user, boolean isFollowed){
         this.username = user.getUsername();
         this.nickname = user.getNickname();
         this.profileImage = user.getProfileImage();
+        this.isFollowed = isFollowed;
     }
 }

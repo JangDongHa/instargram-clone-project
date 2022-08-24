@@ -4,6 +4,7 @@ import com.clone.instargram.domain.comment.Comment;
 import com.clone.instargram.domain.comment.CommentRepository;
 import com.clone.instargram.domain.comment.like.CommentLike;
 import com.clone.instargram.domain.comment.like.CommentLikeRepository;
+import com.clone.instargram.domain.follow.FollowRepository;
 import com.clone.instargram.domain.post.Post;
 import com.clone.instargram.domain.post.PostRepository;
 import com.clone.instargram.domain.user.User;
@@ -30,6 +31,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
 
     // 댓글 작성
@@ -154,7 +156,9 @@ public class CommentServiceImpl implements CommentService {
 
     // 댓글 좋아요 상세보기
     @Override
-    public ResponseDto<?> commentLikeInfo(Long postId, Long commentId) {
+    @Transactional(readOnly = true)
+    public ResponseDto<?> commentLikeInfo(Long postId, Long commentId, String usernameTK) {
+        User userPS = userRepository.findByUsername(usernameTK).orElseThrow(()-> new IllegalArgumentException(ExceptionNaming.NEED_TOKEN));
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException(ExceptionNaming.CANNOT_FIND_POST)
         );
@@ -169,6 +173,7 @@ public class CommentServiceImpl implements CommentService {
                             .username(commentLike.getUser().getUsername())
                             .nickname(commentLike.getUser().getNickname())
                             .profileImage(commentLike.getUser().getProfileImage())
+                            .isFollowed(followRepository.existsByToUserAndFromUser(userPS, commentLike.getUser()).orElse(false))
                             .build()
             );
         }

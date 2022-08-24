@@ -13,4 +13,5 @@ public class CommentLikeInfoResponseDto {
     private String username;
     private String nickname;
     private String profileImage;
+    private boolean isFollowed;
 }

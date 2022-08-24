@@ -14,10 +14,10 @@ import java.util.List;
 public interface PostService {
     String createPost(PostStringDto postDto, String usernameTK);
     String updatePost(UpdatePostStringDto postDto, String usernameTK);
-    ResponsePostDto getPost(long postId, String username);
+    ResponsePostDto getPost(long postId, String usernameTK);
     String deletePost(long postId, String usernameTK);
-    List<ResponsePostLikeUserDto> getPostLikeUsers(long postId);
+    List<ResponsePostLikeUserDto> getPostLikeUsers(long postId, String usernameTK);
     Boolean postLike(long postId, String usernameTK);
-    List<ResponsePostListDto> getPostList(String username);
-    Page<ResponsePostRecentListDto> getRecentPostList(Pageable pageable, String username);
+    List<ResponsePostListDto> getPostList(String usernameTK);
+    Page<ResponsePostRecentListDto> getRecentPostList(Pageable pageable, String usernameTK);
 }

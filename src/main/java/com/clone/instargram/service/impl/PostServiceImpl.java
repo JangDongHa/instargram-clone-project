@@ -3,6 +3,7 @@ package com.clone.instargram.service.impl;
 import com.clone.instargram.domain.comment.Comment;
 import com.clone.instargram.domain.comment.CommentRepository;
 import com.clone.instargram.domain.comment.like.CommentLikeRepository;
+import com.clone.instargram.domain.follow.FollowRepository;
 import com.clone.instargram.domain.post.Post;
 import com.clone.instargram.domain.post.PostRepository;
 import com.clone.instargram.domain.post.like.PostLike;
@@ -42,6 +43,7 @@ public class PostServiceImpl implements PostService {
     private final CommentRepository commentRepository;
 
     private final CommentLikeRepository commentLikeRepository;
+    private final FollowRepository followRepository;
 
 //    @Override
 //    @Transactional
@@ -100,8 +102,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponsePostDto getPost(long postId, String username){
-        User userPS = userRepository.findByUsername(username).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
+    public ResponsePostDto getPost(long postId, String usernameTK){
+        User userPS = userRepository.findByUsername(usernameTK).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
         Post postPS = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
 
         List<Tag> tags = tagRepository.findAllByPost(postPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_TAGS));
@@ -128,12 +130,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ResponsePostLikeUserDto> getPostLikeUsers(long postId){
+    public List<ResponsePostLikeUserDto> getPostLikeUsers(long postId, String usernameTK){
+        User userPS = userRepository.findByUsername(usernameTK).orElseThrow(()->new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_POST));
         List<PostLikeMapping> users = postLikeRepository.findUsersByPost(post).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE));
 
         List<ResponsePostLikeUserDto> dtoList = new ArrayList<>();
-        users.forEach(m -> dtoList.add(new ResponsePostLikeUserDto(m.getUser())));
+        users.forEach(m -> dtoList.add(new ResponsePostLikeUserDto(m.getUser(), followRepository.existsByToUserAndFromUser(userPS, m.getUser()).orElse(false))));
 
         return dtoList;
     }
@@ -167,8 +170,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ResponsePostListDto> getPostList(String username){
-        User userPS = userRepository.findByUsername(username).orElseThrow(()-> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
+    public List<ResponsePostListDto> getPostList(String usernameTK){
+        User userPS = userRepository.findByUsername(usernameTK).orElseThrow(()-> new IllegalArgumentException(PostExceptionNaming.CANNOT_FIND_USER));
 
         List<Post> postsPS = postRepository.findAllByUserOrderByIdDesc(userPS).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST));
         List<ResponsePostListDto> dtoList = new ArrayList<>();
@@ -180,8 +183,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Page<ResponsePostRecentListDto> getRecentPostList(Pageable pageable, String username){
-        User userPS = userRepository.findByUsername(username).orElseThrow(()->new IllformedLocaleException(PostExceptionNaming.CANNOT_FIND_USER));
+    public Page<ResponsePostRecentListDto> getRecentPostList(Pageable pageable, String usernameTK){
+        User userPS = userRepository.findByUsername(usernameTK).orElseThrow(()->new IllformedLocaleException(PostExceptionNaming.CANNOT_FIND_USER));
         Page<Post> postsPS = postRepository.findAll(pageable);
         Page<ResponsePostRecentListDto> dtoList = postsPS.map(post ->
                         new ResponsePostRecentListDto(post, commentRepository.countByPost(post).orElse(0L), tagRepository.findAllByPost(post).orElse(null).get(0)

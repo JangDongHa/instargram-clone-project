@@ -13,5 +13,5 @@ public interface CommentService {
 
     ResponseDto<?> commentLike(Long postId, Long commentId, String username);
 //
-    ResponseDto<?> commentLikeInfo(Long postId, Long commentId);
+    ResponseDto<?> commentLikeInfo(Long postId, Long commentId, String username);
 }

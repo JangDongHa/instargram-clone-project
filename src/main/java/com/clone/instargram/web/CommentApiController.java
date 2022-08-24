@@ -47,8 +47,8 @@ public class CommentApiController {
 
     // 댓글 좋아요 상세보기
     @GetMapping("api/user/posts/{postId}/comments/{commentId}/likes")
-    public ResponseDto<?> commentLikeInfo(@PathVariable Long postId, @PathVariable Long commentId) {
-        return commentService.commentLikeInfo(postId, commentId);
+    public ResponseDto<?> commentLikeInfo(@PathVariable Long postId, @PathVariable Long commentId, HttpServletRequest request) {
+        return commentService.commentLikeInfo(postId, commentId, getUsername(request));
     }
 
     // 로그인 검증, 로그인한 유저의 username 가지고 옴
