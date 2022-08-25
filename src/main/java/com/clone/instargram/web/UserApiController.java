@@ -22,7 +22,7 @@ public class UserApiController {
         return new ResponseDto<>(HttpStatus.OK, userService.register(dto));
     }
 
-    @PostMapping("/api/user/profile")
+    @PutMapping("/api/user/profile")
     public ResponseDto<String> updateProfileApi(@RequestBody UpdateUserProfileStringDto dto, HttpServletRequest request){
         return new ResponseDto<>(HttpStatus.OK, userService.updateProfileImage(getUsername(request), dto));
     }
