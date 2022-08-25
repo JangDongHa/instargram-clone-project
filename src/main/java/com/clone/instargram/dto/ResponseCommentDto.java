@@ -27,6 +27,6 @@ public class ResponseCommentDto {
         this.content = comment.getContent();
         this.likesCount = comment.getLikesCount();
         this.profileImage = comment.getUser().getProfileImage();
-
+        this.isLiked = isLiked;
     }
 }
