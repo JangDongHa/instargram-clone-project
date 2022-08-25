@@ -29,6 +29,7 @@ public class UpdatePostStringDto {
 
     public Tag toTag(Tag tag){
         return Tag.builder()
+                .id(tag.getId())
                 .tagName(this.tag)
                 .post(tag.getPost())
                 .build();
