@@ -173,7 +173,7 @@ public class CommentServiceImpl implements CommentService {
                             .username(commentLike.getUser().getUsername())
                             .nickname(commentLike.getUser().getNickname())
                             .profileImage(commentLike.getUser().getProfileImage())
-                            .isFollowed(followRepository.existsByToUserAndFromUser(userPS, commentLike.getUser()).orElse(false))
+                            .isFollowed(followRepository.existsByToUserAndFromUser(commentLike.getUser(), userPS))
                             .build()
             );
         }

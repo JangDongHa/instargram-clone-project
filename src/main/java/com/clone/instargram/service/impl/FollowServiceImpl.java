@@ -40,7 +40,7 @@ public class FollowServiceImpl implements FollowService {
             throw new DataIntegrityViolationException( ExceptionNaming.WRONG_TYPE );
         }
 
-        boolean isFollowed = followRepository.existsByToUserAndFromUser( toUser , fromUser ).orElseThrow();
+        boolean isFollowed = followRepository.existsByToUserAndFromUser( toUser , fromUser );
 
         if( isFollowed ){
             followRepository.deleteByToUserAndFromUser( toUser , fromUser );
@@ -69,7 +69,7 @@ public class FollowServiceImpl implements FollowService {
 
         for( Follow follower : followers ){
             User fromUser = follower.getFromUser();
-            boolean isFollowed = followRepository.existsByToUserAndFromUser( fromUser , me ).orElseThrow();
+            boolean isFollowed = followRepository.existsByToUserAndFromUser( fromUser , me );
             follower_list.add( new FollowResponseDto( fromUser, isFollowed ) );
         }
 
@@ -92,7 +92,7 @@ public class FollowServiceImpl implements FollowService {
 
         for( Follow follow : follows ){
             User toUser = follow.getToUser();
-            boolean isFollowed = followRepository.existsByToUserAndFromUser( toUser , me ).orElseThrow();
+            boolean isFollowed = followRepository.existsByToUserAndFromUser( toUser , me );
             follow_list.add( new FollowResponseDto( toUser, isFollowed ) );
         }
 

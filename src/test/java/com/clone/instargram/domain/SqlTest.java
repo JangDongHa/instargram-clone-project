@@ -77,7 +77,7 @@ public class SqlTest {
         User user2PS = userRepository.findByUsername("test2").orElseThrow();
 
         // When
-        boolean isExist = followRepository.existsByToUserAndFromUser(userPS, user2PS).orElseThrow();
+        boolean isExist = followRepository.existsByToUserAndFromUser(userPS, user2PS);
 
         // Then
         assertTrue(isExist);

@@ -136,7 +136,7 @@ public class PostServiceImpl implements PostService {
         List<PostLikeMapping> users = postLikeRepository.findUsersByPost(post).orElseThrow(() -> new IllegalArgumentException(PostExceptionNaming.ERROR_POST_LIKE));
 
         List<ResponsePostLikeUserDto> dtoList = new ArrayList<>();
-        users.forEach(m -> dtoList.add(new ResponsePostLikeUserDto(m.getUser(), followRepository.existsByToUserAndFromUser(userPS, m.getUser()).orElse(false))));
+        users.forEach(m -> dtoList.add(new ResponsePostLikeUserDto(m.getUser(), followRepository.existsByToUserAndFromUser(m.getUser(), userPS))));
 
         return dtoList;
     }

@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface FollowRepository extends JpaRepository<Follow, Long> {
     Optional<Long> countByFromUser(User fromUser);
     Optional<Long> countByToUser(User toUser);
-    Optional<Boolean> existsByToUserAndFromUser(User toUser, User fromUser);
+    Boolean existsByToUserAndFromUser(User toUser, User fromUser);
 
     Optional<Follow> deleteByToUserAndFromUser(User toUser, User fromUser);
 
