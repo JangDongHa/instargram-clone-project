@@ -1,13 +1,11 @@
 package com.clone.instargram.service;
 
-import com.clone.instargram.dto.ResponsePostRecentListDto;
-import com.clone.instargram.dto.request.PostStringDto;
-import com.clone.instargram.dto.request.UpdatePostStringDto;
 import com.clone.instargram.dto.ResponsePostDto;
 import com.clone.instargram.dto.ResponsePostLikeUserDto;
 import com.clone.instargram.dto.ResponsePostListDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.clone.instargram.dto.ResponsePostRecentListDto;
+import com.clone.instargram.dto.request.PostStringDto;
+import com.clone.instargram.dto.request.UpdatePostStringDto;
 
 import java.util.List;
 
@@ -19,5 +17,5 @@ public interface PostService {
     List<ResponsePostLikeUserDto> getPostLikeUsers(long postId, String usernameTK);
     Boolean postLike(long postId, String usernameTK);
     List<ResponsePostListDto> getPostList(String usernameTK);
-    Page<ResponsePostRecentListDto> getRecentPostList(Pageable pageable, String usernameTK);
+    List<ResponsePostRecentListDto> getRecentPostList(String usernameTK);
 }

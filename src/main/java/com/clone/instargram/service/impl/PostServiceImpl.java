@@ -22,8 +22,6 @@ import com.clone.instargram.service.PostService;
 import com.clone.instargram.service.definition.PostReturnNaming;
 import com.clone.instargram.util.AwsS3Connector;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -183,12 +181,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Page<ResponsePostRecentListDto> getRecentPostList(Pageable pageable, String usernameTK){
+    public List<ResponsePostRecentListDto> getRecentPostList(String usernameTK){
         User userPS = userRepository.findByUsername(usernameTK).orElseThrow(()->new IllformedLocaleException(PostExceptionNaming.CANNOT_FIND_USER));
-        Page<Post> postsPS = postRepository.findAll(pageable);
-        Page<ResponsePostRecentListDto> dtoList = postsPS.map(post ->
+        List<Post> postsPS = postRepository.findAll();
+        List<ResponsePostRecentListDto> dtoList = postsPS.stream().map(post ->
                         new ResponsePostRecentListDto(post, commentRepository.countByPost(post).orElse(0L), tagRepository.findAllByPost(post).orElse(null).get(0)
-                                , postLikeRepository.existsByUserAndPost(userPS, post)));
+                                , postLikeRepository.existsByUserAndPost(userPS, post))).toList();
 
 
         return dtoList;

@@ -6,10 +6,6 @@ import com.clone.instargram.dto.request.PostStringDto;
 import com.clone.instargram.dto.request.UpdatePostStringDto;
 import com.clone.instargram.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,9 +53,8 @@ public class PostApiController {
     }
 
     @GetMapping("/api/recent/posts")
-    public ResponseDto<Page<ResponsePostRecentListDto>> getRecentPostListApi(@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
-    , HttpServletRequest request){
-        return new ResponseDto<>(HttpStatus.OK, postService.getRecentPostList(pageable, getUsername(request)));
+    public ResponseDto<List<ResponsePostRecentListDto>> getRecentPostListApi(HttpServletRequest request){
+        return new ResponseDto<>(HttpStatus.OK, postService.getRecentPostList(getUsername(request)));
     }
 
 
