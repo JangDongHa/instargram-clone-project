@@ -27,7 +27,7 @@ public class FollowApiController {
 
     // 팔로우 등록, 취소
     @PostMapping("/user/{username}/follow")
-    public ResponseEntity<ResponseDto<String>> doFollowing(@PathVariable String username , HttpServletRequest request ){
+    public ResponseEntity<ResponseDto<Boolean>> doFollowing(@PathVariable String username , HttpServletRequest request ){
         String fromUser = getUsername( request );
         return ResponseEntity.ok( new ResponseDto<>( HttpStatus.OK , followService.doFollowing( fromUser, username ) ));
 
