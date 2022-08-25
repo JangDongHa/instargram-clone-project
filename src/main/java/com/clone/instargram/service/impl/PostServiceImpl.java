@@ -22,6 +22,7 @@ import com.clone.instargram.service.PostService;
 import com.clone.instargram.service.definition.PostReturnNaming;
 import com.clone.instargram.util.AwsS3Connector;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -183,7 +184,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public List<ResponsePostRecentListDto> getRecentPostList(String usernameTK){
         User userPS = userRepository.findByUsername(usernameTK).orElseThrow(()->new IllformedLocaleException(PostExceptionNaming.CANNOT_FIND_USER));
-        List<Post> postsPS = postRepository.findAll();
+        List<Post> postsPS = postRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
         List<ResponsePostRecentListDto> dtoList = postsPS.stream().map(post ->
                         new ResponsePostRecentListDto(post, commentRepository.countByPost(post).orElse(0L), tagRepository.findAllByPost(post).orElse(null).get(0)
                                 , postLikeRepository.existsByUserAndPost(userPS, post))).toList();
