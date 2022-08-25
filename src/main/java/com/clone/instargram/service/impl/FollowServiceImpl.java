@@ -27,7 +27,7 @@ public class FollowServiceImpl implements FollowService {
     // 팔로우 등록, 취소
     @Override
     @Transactional
-    public String doFollowing(String fromUsername, String toUsername ) {
+    public boolean doFollowing(String fromUsername, String toUsername ) {
 
         User fromUser = userRepository.findByUsername( fromUsername ).orElseThrow(
                 () -> new UsernameNotFoundException(ExceptionNaming.NOT_FOUND_USER )
@@ -44,12 +44,12 @@ public class FollowServiceImpl implements FollowService {
 
         if( isFollowed ){
             followRepository.deleteByToUserAndFromUser( toUser , fromUser );
-            return "팔로우 취소";
+            return false;
         }
 
         Follow follow = Follow.builder().fromUser( fromUser ).toUser( toUser ).build();
         followRepository.save( follow );
-        return "팔로우 완료";
+        return true;
    }
 
    // 팔로워 목록 보기
